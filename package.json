@@ -1,0 +1,12 @@
+{
+  "name": "fisd-xc-blockscout-ops",
+  "version": "0.1.0",
+  "private": true,
+  "description": "FISD XC: an onchain impact operations dashboard powered by Blockscout Pro API",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
