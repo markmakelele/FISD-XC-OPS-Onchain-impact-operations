@@ -91,9 +91,10 @@ function serveStatic(req, res, pathname) {
   let decoded;
   try { decoded = decodeURIComponent(pathname); } catch { return jsonError(res, 400, 'Invalid URL path.'); }
   if (decoded === '/') decoded = '/index.html';
-  if (decoded !== '/index.html') return jsonError(res, 404, 'Not found.');
+  const allowedStatic = new Set(['/index.html','/assets/brand-tokens.css','/assets/fisd-xc-dark.svg','/assets/fisd-xc-light.svg','/assets/fisd-xc-compact.svg','/assets/fisd-xc-compact-dark.svg','/assets/fisd-xc-compact-light.svg','/assets/favicon.svg']);
+  if (!allowedStatic.has(decoded)) return jsonError(res, 404, 'Not found.');
   const full = path.resolve(ROOT, '.' + decoded);
-  if (!full.startsWith(ROOT + path.sep) && full !== path.join(ROOT,'index.html')) return jsonError(res, 403, 'Forbidden.');
+  if (!full.startsWith(ROOT + path.sep)) return jsonError(res, 403, 'Forbidden.');
   fs.readFile(full, (err, data) => {
     if (err) return jsonError(res, err.code === 'ENOENT' ? 404 : 500, err.code === 'ENOENT' ? 'Not found.' : 'Unable to read file.');
     const ext = path.extname(full).toLowerCase();
