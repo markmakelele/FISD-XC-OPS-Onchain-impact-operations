@@ -1,26 +1,28 @@
-# 90-second FISD XC demo script
+![FISD XC](assets/fisd-xc-light.svg)
 
-**0:00–0:12 — Problem**  
-“Blockscout provides high-quality onchain evidence. FISD XC adds an operational layer: it shows which observed transactions warrant attention, where they sit in time, and what to inspect next.”
+# FISD XC / OPS — 90-second demo script
 
-**0:12–0:25 — Demo mode**  
-Open the dashboard in simulation mode. Point out the upper impact field, time scale, four metrics and next-best-action panel. State clearly that the fixture is simulated until a live address is connected.
+## 00:00–00:12 · The problem
+“Blockscout is the evidence layer. FISD XC is the decision layer. We take indexed wallet or contract activity and help an operator decide what to inspect next without hiding the source transaction.”
 
-**0:25–0:45 — Live Blockscout integration**  
-With `BLOCKSCOUT_PRO_API_KEY` configured in the local server `.env`, paste a public wallet or contract address and choose its chain. Click Connect live. Explain that FISD requests Blockscout Pro address details, address transactions and token-transfer evidence via REST v2. Wait for real returned records.
+## 00:12–00:25 · Establish the interface
+Open the dashboard in **Simulation** mode. Point out the impact field, timescale, sampled-activity metrics and next-action panel. State that the fixture is simulated until an authorized live source is connected.
 
-**0:45–1:02 — Trace one event**  
-Select a recent transaction. Show the transaction hash, sender, recipient, block/time, score explanation and recommendation. Open its Blockscout Explorer record to validate the underlying evidence.
+## 00:25–00:45 · Connect evidence
+With `BLOCKSCOUT_PRO_API_KEY` configured server-side, paste a public wallet or contract address, select the correct chain and choose **Connect live**. Explain the address, transaction and best-effort token-transfer requests made through Blockscout Pro REST v2. Wait for the UI to confirm the observed response.
 
-**1:02–1:18 — Why this score / next action**  
-Open Method. Explain the heuristic inputs: recency, native value relative to the sampled window, contract interaction and observed outcome. Emphasize that the score prioritizes inspection; it is not a fraud verdict or a valuation.
+## 00:45–01:02 · Trace an event
+Select a returned transaction. Show its hash, sender, recipient, block/time, visible score inputs and recommendation. Open the matching Blockscout Explorer record to verify the evidence.
 
-**1:18–1:30 — Human-in-the-loop**  
-Add a manual operational note such as “Reconcile treasury outflow.” Explain that FISD labels local annotations separately from observed onchain transactions. Close with: “Blockscout is the evidence layer; FISD is the decision layer.”
+## 01:02–01:18 · Explain the recommendation
+Open **Method**. Describe the score as a triage heuristic based on recency, sampled native-value magnitude, interaction type, direction and observed outcome. It is a prompt for inspection, not a fraud verdict or financial valuation.
+
+## 01:18–01:30 · Keep the operator in control
+Add a manual note such as “Reconcile treasury outflow.” Show that it is labelled as a local annotation rather than a chain observation. Close with: “Blockscout is the evidence layer; FISD XC is the decision layer.”
 
 ## Before recording
-
-- Configure a working Pro API key in `.env`; never include it in a screen recording or source commit.
-- Use a public address with visible transaction history on a chain allowed by the key.
-- Confirm that live mode is labelled “BLOCKSCOUT PRO · LIVE” before making any live-data claim.
-- Test at the actual demo machine / browser and keep the manual/demo flow as backup.
+- Verify the key has access to the selected chain.
+- Use a public address with visible transaction history.
+- Do not show or commit the API key.
+- Confirm the UI is labelled **LIVE** before claiming live data.
+- Test the full run in the target browser and keep the simulation path as backup.
