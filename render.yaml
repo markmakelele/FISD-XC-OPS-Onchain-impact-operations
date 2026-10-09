@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: fisd-xc-ops
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: BLOCKSCOUT_PRO_API_KEY
+        sync: false
+      - key: BLOCKSCOUT_PRO_API_BASE_URL
+        value: https://api.blockscout.com
