@@ -18,6 +18,7 @@ function loadEnv(file) {
 }
 loadEnv(path.join(ROOT, '.env'));
 const PORT = Number(process.env.PORT || 4173);
+const HOST = process.env.HOST || '127.0.0.1';
 const API_KEY = process.env.BLOCKSCOUT_PRO_API_KEY || '';
 const API_BASE = (process.env.BLOCKSCOUT_PRO_API_BASE_URL || 'https://api.blockscout.com').replace(/\/$/, '');
 const ALLOWED_CHAINS = new Set(['1','10','100','137','42161','8453']);
@@ -91,7 +92,7 @@ function serveStatic(req, res, pathname) {
   let decoded;
   try { decoded = decodeURIComponent(pathname); } catch { return jsonError(res, 400, 'Invalid URL path.'); }
   if (decoded === '/') decoded = '/index.html';
-  const allowedStatic = new Set(['/index.html','/BRAND_OVERVIEW.html','/FISD_XC_Blockscout_MVP.html','/fisd-xc-dashboard.html','/FISD_XC_Operational_Live_Source_Dashboard.html','/impact-schedule-sequential.html','/assets/brand-tokens.css','/assets/fisd-xc-dark.svg','/assets/fisd-xc-light.svg','/assets/fisd-xc-compact.svg','/assets/fisd-xc-compact-dark.svg','/assets/fisd-xc-compact-light.svg','/assets/favicon.svg']);
+  const allowedStatic = new Set(['/index.html','/BRAND_OVERVIEW.html','/BRAND_GUIDELINES.md','/HOSTING_PROFILES.md','/README.md','/SUBMISSION_BRIEF.md','/DEMO_SCRIPT.md','/FISD_Futuristic_Impact_Schedule_Dashboard.html','/FISD_XC_Blockscout_MVP.html','/FISD_XC_Clasped_Impact_Schedule_Dashboard.html','/FISD_XC_Operational_Live_Source_Dashboard.html','/FISD_XC_Ops_Activated_High_Visibility.html','/FISD_XC_Responsive_Explained_Dashboard.html','/fisd-xc-dashboard.html','/impact-schedule-sequential.html','/assets/brand-tokens.css','/assets/fisd-xc-dark.svg','/assets/fisd-xc-light.svg','/assets/fisd-xc-compact.svg','/assets/fisd-xc-compact-dark.svg','/assets/fisd-xc-compact-light.svg','/assets/favicon.svg']);
   if (!allowedStatic.has(decoded)) return jsonError(res, 404, 'Not found.');
   const full = path.resolve(ROOT, '.' + decoded);
   if (!full.startsWith(ROOT + path.sep)) return jsonError(res, 403, 'Forbidden.');
@@ -109,8 +110,8 @@ const server = http.createServer(async (req, res) => {
   if (u.pathname.startsWith('/api/')) return jsonError(res, 404, 'API route not found.');
   serveStatic(req, res, u.pathname);
 });
-server.listen(PORT, '127.0.0.1', () => {
-  console.log(`FISD XC Ops running at http://127.0.0.1:${PORT}`);
+server.listen(PORT, HOST, () => {
+  console.log(`FISD XC Ops listening on ${HOST}:${PORT}`);
   console.log(`Blockscout Pro API key configured: ${API_KEY ? 'yes' : 'no (demo mode still works)'}`);
 });
 process.on('SIGINT', () => server.close(() => process.exit(0)));
