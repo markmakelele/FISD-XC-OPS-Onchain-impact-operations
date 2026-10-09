@@ -1,0 +1,9 @@
+/* FISD XC Brand ID tokens */
+:root{
+ --fisd-brand-slate:#BDCBD4; --fisd-ink:#000000; --fisd-paper:#F8F8F5; --fisd-dark-bg:#08090C;
+ --fisd-dark-surface:#0E1015; --fisd-dark-text:#F3F4F5; --fisd-dark-muted:#A3A9B4; --fisd-dark-line:#292E38;
+ --fisd-light-bg:#F8F8F5; --fisd-light-surface:#FFFFFF; --fisd-light-panel:#F0F1ED; --fisd-light-text:#11110F;
+ --fisd-light-muted:#5E5E58; --fisd-light-line:#C9C9C3; --fisd-light-line-strong:#858C8E;
+}
+[data-theme="dark"]{color-scheme:dark;--bg:var(--fisd-dark-bg);--panel:var(--fisd-dark-surface);--panel2:#12151B;--fg:var(--fisd-dark-text);--muted:var(--fisd-dark-muted);--faint:#858E9A;--line:var(--fisd-dark-line);--line2:#49515E;--accent:var(--fisd-brand-slate);--fisd-logo-color:var(--fisd-brand-slate);--green:#A6E3C7;--amber:#F2D18B;--red:#F3A2A2;--soft:rgba(189,203,212,.12)}
+[data-theme="light"]{color-scheme:light;--bg:var(--fisd-light-bg);--panel:var(--fisd-light-surface);--panel2:var(--fisd-light-panel);--fg:var(--fisd-light-text);--muted:var(--fisd-light-muted);--faint:#70766F;--line:var(--fisd-light-line);--line2:var(--fisd-light-line-strong);--accent:#425A65;--fisd-logo-color:var(--fisd-ink);--green:#14794D;--amber:#8A5B05;--red:#B42318;--soft:rgba(66,90,101,.10)}
