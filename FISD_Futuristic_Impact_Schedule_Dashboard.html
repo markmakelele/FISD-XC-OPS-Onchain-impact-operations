@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FISD XC — Visual Study / FISD Futuristic Impact Schedule Dashboard</title>
+<style>
+@font-face{font-family:FISDMono;src:local("IBM Plex Mono"),local("SFMono-Regular"),local("Consolas"),monospace}
+:root{
+ --bg:#050505;--fg:#f4f4ef;--muted:#85857e;--line:#353532;--line2:#777770;
+ --panel:#0a0a09;--field:#11110f;--halo:rgba(244,244,239,.08);
+}
+[data-theme=light]{
+ --bg:#f5f5f1;--fg:#11110f;--muted:#74746e;--line:#c9c9c3;--line2:#888881;
+ --panel:#fff;--field:#e9e9e5;--halo:rgba(17,17,15,.08)
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg)}
+body{font-family:FISDMono,monospace;letter-spacing:.1em;font-size:11px}
+button,input,select{font:inherit;letter-spacing:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid var(--fg);outline-offset:2px}
+.shell{max-width:1680px;margin:auto;padding:20px 28px 28px}
+.header{height:56px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.wordmark{font-size:14px;letter-spacing:.34em}
+.wordmark small{font-size:8px;letter-spacing:.18em;color:var(--muted);margin-left:14px}
+.header-right{display:flex;align-items:center;gap:8px}
+.live{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:8px;margin-right:8px}
+.live b{width:6px;height:6px;border-radius:50%;background:var(--fg);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.25}}
+.btn{background:transparent;border:1px solid var(--line2);padding:9px 12px;font-size:8px}
+.btn:hover{background:var(--fg);color:var(--bg)}
+
+/* program architecture */
+.program{display:grid;grid-template-columns:154px 1fr;border-bottom:1px solid var(--line)}
+.rail{border-right:1px solid var(--line);padding:26px 20px 20px 0}
+.rail-title{font-size:9px;letter-spacing:.22em;margin-bottom:16px}
+.rail-copy{font-size:8px;line-height:1.9;color:var(--muted);letter-spacing:.08em}
+.rail-meta{margin-top:28px;padding-top:15px;border-top:1px solid var(--line);font-size:7px;line-height:2;color:var(--muted)}
+.stage{position:relative;min-width:0}
+
+/* impact field */
+.impact{height:292px;position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+.impact:before{
+ content:"";position:absolute;inset:0;opacity:.22;
+ background-image:radial-gradient(circle at 1px 1px,var(--muted) .65px,transparent .8px);
+ background-size:29px 29px;
+}
+.field-title{position:absolute;left:18px;top:20px;color:var(--muted);font-size:8px;letter-spacing:.28em}
+.now-field{position:absolute;top:0;bottom:0;left:50%;border-left:1px dashed var(--line2);opacity:.35}
+.now-field span{position:absolute;top:19px;left:8px;font-size:7px;color:var(--muted)}
+#impactLinks{position:absolute;inset:0;pointer-events:none}
+.impact-link{
+ position:absolute;height:1px;background:var(--line2);transform-origin:0 50%;
+ opacity:.26;transition:opacity .25s,background .25s,height .25s;
+}
+.impact-link:after{content:"";position:absolute;right:-2px;top:50%;width:4px;height:4px;border:1px solid var(--line2);border-radius:50%;background:var(--bg);transform:translate(50%,-50%)}
+.impact-link.focus{opacity:.95;background:var(--fg);height:1.5px}
+.impact-link.focus:after{border-color:var(--fg)}
+.impact-link.dim{opacity:.06}
+.impact-node{
+ position:absolute;border:1px solid var(--fg);border-radius:50%;background:var(--bg);
+ transform:translate(-50%,-50%);padding:0;display:flex;align-items:center;justify-content:center;
+ transition:left .45s cubic-bezier(.2,.8,.2,1),top .45s cubic-bezier(.2,.8,.2,1),width .3s,height .3s,opacity .25s,box-shadow .25s;
+}
+.impact-node:before{content:"";position:absolute;inset:-9px;border:1px dotted var(--line);border-radius:50%;opacity:.7}
+.impact-node:after{content:"";position:absolute;inset:19%;border:1px solid var(--line2);border-radius:50%;opacity:.55}
+.impact-node:hover,.impact-node.selected{box-shadow:0 0 0 7px var(--halo),0 0 22px var(--halo)}
+.impact-node.selected{background:var(--fg);color:var(--bg)}
+.impact-number{font-size:8px;z-index:2;letter-spacing:0}
+.impact-name{position:absolute;top:calc(100% + 10px);white-space:nowrap;color:var(--muted);font-size:7px;letter-spacing:.1em}
+.impact-node.selected .impact-name{color:var(--fg)}
+.field-footer{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);font-size:7px;color:var(--muted);letter-spacing:.22em}
+
+/* connector/timeline */
+.timeline-stage{height:540px;position:relative}
+#viz{display:block;width:100%;height:100%}
+.connector{fill:none;stroke:var(--line2);stroke-width:1.15;vector-effect:non-scaling-stroke;transition:opacity .2s,stroke .2s,stroke-width .2s}
+.connector.dim{opacity:.11}
+.connector.focus{stroke:var(--fg);stroke-width:1.8}
+.event-line{stroke:var(--line2);stroke-width:1;vector-effect:non-scaling-stroke;transition:opacity .2s}
+.event-line.dim{opacity:.12}
+.event-line.focus{stroke:var(--fg)}
+.event-bar{fill:var(--fg);opacity:.94;transition:opacity .2s}
+.event-bar.dim{opacity:.12}
+.event-bar.focus{filter:drop-shadow(0 0 6px var(--fg))}
+.event-label{fill:var(--fg);font-size:8px;letter-spacing:.05em}
+.event-label.dim{opacity:.14}
+.axis-line{stroke:var(--line);stroke-width:1}
+.axis-tick{stroke:var(--line2);stroke-width:1}
+.axis-text{fill:var(--muted);font-size:8px;letter-spacing:.08em}
+.section-text{fill:var(--muted);font-size:8px;letter-spacing:.32em}
+.now-svg{stroke:var(--fg);stroke-width:1;opacity:.55}
+.now-svg-label{fill:var(--fg);font-size:7px;letter-spacing:.18em}
+
+/* selected state */
+.inspect{
+ min-height:84px;border-bottom:1px solid var(--line);
+ display:grid;grid-template-columns:1.6fr .8fr .8fr .8fr 2fr auto;
+ align-items:center;gap:18px;padding:14px 0;
+}
+.cap{font-size:7px;color:var(--muted);margin-bottom:7px}
+.val{font-size:9px;letter-spacing:.08em}
+.desc{font-size:7px;color:var(--muted);line-height:1.8;letter-spacing:.06em}
+.inspect button{background:transparent;border:1px solid var(--line2);padding:8px 10px;font-size:7px}
+.inspect button:hover{background:var(--fg);color:var(--bg)}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);font-size:8px}
+
+/* entry / data control */
+.entry{padding-top:18px}
+.entry-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.entry-title{font-size:8px;letter-spacing:.3em}
+.entry-count{font-size:7px;color:var(--muted)}
+.form{
+ display:grid;grid-template-columns:1.35fr 1.45fr .8fr .75fr .7fr .8fr auto;gap:7px;
+ border:1px solid var(--line);padding:9px;background:var(--panel)
+}
+.field{min-width:0;background:var(--field);border:1px solid var(--line);padding:11px 10px;font-size:8px}
+.field::placeholder{color:var(--muted)}
+.field:focus{border-color:var(--fg)}
+.add{border:1px solid var(--fg);background:var(--fg);color:var(--bg);padding:11px 14px;font-size:8px;white-space:nowrap}
+.add:hover{background:transparent;color:var(--fg)}
+.note{font-size:7px;color:var(--muted);margin-top:8px;letter-spacing:.07em}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.chip{background:var(--panel);border:1px solid var(--line);padding:6px 8px;font-size:7px;display:flex;gap:7px;align-items:center}
+.chip i{width:5px;height:5px;border-radius:50%;background:var(--fg)}
+.chip button{border:0;background:none;padding:0;color:var(--muted);font-size:10px}
+.chip button:hover{color:var(--fg)}
+
+.tip{position:fixed;display:none;z-index:50;background:var(--fg);color:var(--bg);padding:9px 11px;font-size:7px;line-height:1.8;letter-spacing:.07em;pointer-events:none;max-width:270px}
+
+@media(max-width:1050px){
+ .program{grid-template-columns:115px 1fr}
+ .form{grid-template-columns:1fr 1fr 1fr 1fr}
+ .add{grid-column:4}
+ .inspect{grid-template-columns:1fr 1fr 1fr}
+ .inspect .desc{grid-column:1/-1}
+}
+@media(max-width:700px){
+ .shell{padding:12px}
+ .header{height:48px}.wordmark{font-size:11px}.wordmark small{display:none}
+ .program{display:block}.rail{display:none}
+ .impact{height:260px}.timeline-stage{height:510px}
+ .form{grid-template-columns:1fr 1fr}.add{grid-column:1/-1}
+ .inspect{grid-template-columns:1fr 1fr}
+}
+@media(max-width:450px){
+ .form{grid-template-columns:1fr}
+ .add{grid-column:auto}
+}
+
+/* Shared FISD XC Brand ID: one palette, one typographic voice, clear contrast. */
+:root{--bg:#08090C;--fg:#F3F4F5;--muted:#A3A9B4;--line:#292E38;--line2:#49515E;--panel:#0E1015;--input:#12151B;--field:#12151B;--accent:#BDCBD4;--soft:rgba(189,203,212,.12);--shadow:rgba(0,0,0,.3)}
+[data-theme="light"]{--bg:#F8F8F5;--fg:#11110F;--muted:#5E5E58;--line:#C9C9C3;--line2:#858C8E;--panel:#FFFFFF;--input:#F0F1ED;--field:#F0F1ED;--accent:#425A65;--soft:rgba(66,90,101,.10);--shadow:rgba(20,25,35,.12)}
+.fisd-logo-inline{width:clamp(42px,4.5vw,58px);height:auto;max-height:48px;object-fit:contain;display:inline-block;vertical-align:middle;flex:0 0 auto}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+</style>
+<link rel="stylesheet" href="assets/brand-tokens.css">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<style id="fisd-shared-brand-bar">
+.fisd-legacy-brandbar{display:flex;align-items:center;justify-content:space-between;gap:14px;position:relative;z-index:1000;padding:10px clamp(12px,2vw,24px);background:var(--bg,#08090C);color:var(--fg,#F3F4F5);border-bottom:1px solid var(--line,#292E38);font:11px/1.45 Inter,system-ui,sans-serif;letter-spacing:.01em}.fisd-legacy-brandbar .lockup{display:flex;align-items:center;gap:10px;min-width:0;color:#BDCBD4;text-decoration:none}.fisd-legacy-brandbar svg{width:38px;height:27px;flex:0 0 auto;color:#BDCBD4}.fisd-legacy-brandbar .brand-label{font:700 10px ui-monospace,monospace;letter-spacing:.12em}.fisd-legacy-brandbar .brand-sub{color:var(--muted,#A3A9B4);font-size:9px}.fisd-legacy-brandbar .bar-link{color:var(--fg,#F3F4F5);text-decoration:none;border:1px solid var(--line2,#49515E);padding:7px 9px;border-radius:4px;font-size:10px;white-space:nowrap}.fisd-legacy-brandbar .bar-link:hover{background:var(--soft,rgba(189,203,212,.12))}.fisd-legacy-brandbar .logo-light{display:none}body[data-theme="light"] .fisd-legacy-brandbar .lockup{color:#000}body[data-theme="light"] .fisd-legacy-brandbar svg{color:#000}body[data-theme="light"] .fisd-legacy-brandbar .logo-dark{display:none}body[data-theme="light"] .fisd-legacy-brandbar .logo-light{display:block}@media(max-width:540px){.fisd-legacy-brandbar{align-items:flex-start}.fisd-legacy-brandbar .brand-sub{display:none}.fisd-legacy-brandbar .bar-link{font-size:9px}}
+</style>
+</head>
+<body data-theme="dark">
+<div class="fisd-legacy-brandbar"><a class="lockup" href="index.html" aria-label="FISD XC brand home"><span class="logo-dark"><svg class="brand-logo" viewBox="0 0 655 464" role="img" aria-labelledby="fisdLogoTitle"><title id="fisdLogoTitle">FISD XC</title><path d="M 572 7 L 543 7 L 543 58 L 542 59 L 540 59 L 535 56 L 533 56 L 532 55 L 530 55 L 529 54 L 527 54 L 526 53 L 523 53 L 522 52 L 518 52 L 517 51 L 511 51 L 510 50 L 489 50 L 488 51 L 482 51 L 481 52 L 476 52 L 475 53 L 472 53 L 471 54 L 469 54 L 468 55 L 465 55 L 462 57 L 457 58 L 456 59 L 455 59 L 454 60 L 441 66 L 439 68 L 438 68 L 434 71 L 434 176 L 437 179 L 438 179 L 441 182 L 442 182 L 447 186 L 448 186 L 457 191 L 459 191 L 462 193 L 465 193 L 466 194 L 468 194 L 469 195 L 473 195 L 474 196 L 481 196 L 482 197 L 499 197 L 500 196 L 505 196 L 506 195 L 510 195 L 511 194 L 513 194 L 514 193 L 519 192 L 522 190 L 524 190 L 525 189 L 528 188 L 530 186 L 531 186 L 532 185 L 535 184 L 537 182 L 538 182 L 544 177 L 545 178 L 545 181 L 546 182 L 546 188 L 547 189 L 547 193 L 572 193 L 573 192 L 573 8 Z M 102 211 L 104 213 L 105 216 L 107 218 L 108 221 L 110 223 L 112 228 L 114 230 L 115 233 L 117 235 L 118 238 L 120 240 L 121 243 L 123 245 L 125 250 L 127 252 L 128 255 L 130 257 L 131 260 L 133 262 L 135 267 L 137 269 L 138 272 L 140 274 L 141 277 L 143 279 L 144 282 L 146 284 L 148 289 L 150 291 L 151 294 L 153 296 L 154 299 L 156 301 L 157 304 L 159 306 L 161 311 L 164 314 L 164 315 L 173 324 L 174 324 L 176 326 L 177 326 L 179 328 L 180 328 L 183 330 L 183 331 L 182 332 L 179 333 L 177 335 L 176 335 L 174 337 L 173 337 L 164 346 L 164 347 L 161 350 L 159 355 L 157 357 L 156 360 L 154 362 L 153 365 L 151 367 L 150 370 L 148 372 L 146 377 L 144 379 L 143 382 L 141 384 L 140 387 L 138 389 L 137 392 L 135 394 L 133 399 L 131 401 L 130 404 L 128 406 L 127 409 L 125 411 L 125 412 L 122 416 L 120 421 L 118 423 L 117 426 L 115 428 L 114 431 L 112 433 L 111 436 L 109 438 L 109 439 L 106 444 L 134 444 L 135 443 L 136 440 L 138 438 L 140 433 L 142 431 L 143 428 L 145 426 L 147 421 L 149 419 L 150 416 L 152 414 L 153 411 L 155 409 L 157 404 L 159 402 L 160 399 L 162 397 L 164 392 L 166 390 L 167 387 L 169 385 L 170 382 L 172 380 L 174 375 L 176 373 L 177 370 L 179 368 L 180 365 L 182 363 L 182 362 L 190 354 L 191 354 L 196 351 L 200 351 L 201 350 L 254 350 L 255 351 L 258 351 L 259 352 L 261 352 L 262 353 L 263 353 L 265 355 L 266 355 L 273 362 L 273 363 L 275 365 L 279 374 L 281 376 L 287 389 L 289 391 L 289 392 L 290 393 L 296 406 L 298 408 L 304 421 L 306 423 L 306 424 L 307 425 L 312 436 L 314 438 L 316 443 L 317 444 L 343 444 L 343 442 L 341 440 L 341 439 L 340 438 L 334 425 L 332 423 L 326 410 L 324 408 L 324 407 L 323 406 L 317 393 L 315 391 L 315 390 L 314 389 L 308 376 L 306 374 L 306 373 L 305 372 L 299 359 L 297 357 L 294 350 L 292 348 L 292 347 L 282 337 L 281 337 L 276 333 L 273 332 L 272 331 L 272 330 L 276 327 L 277 327 L 281 324 L 282 324 L 291 315 L 291 314 L 295 309 L 300 298 L 302 296 L 308 283 L 310 281 L 316 268 L 318 266 L 318 265 L 319 264 L 325 251 L 327 249 L 333 236 L 335 234 L 335 233 L 336 232 L 342 219 L 344 217 L 347 210 L 321 210 L 319 212 L 315 221 L 313 223 L 313 224 L 312 225 L 306 238 L 304 240 L 298 253 L 296 255 L 296 256 L 295 257 L 289 270 L 287 272 L 287 273 L 286 274 L 281 285 L 279 287 L 275 296 L 273 298 L 273 299 L 266 306 L 265 306 L 261 309 L 259 309 L 258 310 L 255 310 L 254 311 L 201 311 L 200 310 L 196 310 L 195 309 L 190 307 L 182 299 L 182 298 L 180 296 L 179 293 L 177 291 L 176 288 L 174 286 L 172 281 L 170 279 L 169 276 L 167 274 L 166 271 L 164 269 L 162 264 L 160 262 L 159 259 L 157 257 L 155 252 L 153 250 L 152 247 L 150 245 L 149 242 L 147 240 L 145 235 L 143 233 L 142 230 L 140 228 L 138 223 L 136 221 L 135 218 L 133 216 L 133 215 L 130 211 L 130 210 L 103 210 Z M 391 237 L 380 248 L 380 249 L 375 254 L 375 255 L 369 263 L 369 264 L 362 277 L 362 279 L 361 280 L 361 282 L 360 283 L 360 285 L 359 286 L 359 289 L 358 290 L 358 293 L 357 294 L 357 299 L 356 300 L 356 310 L 355 311 L 355 346 L 356 347 L 356 358 L 357 359 L 357 363 L 358 364 L 358 368 L 359 369 L 359 371 L 360 372 L 360 375 L 361 376 L 361 378 L 363 381 L 363 383 L 364 384 L 368 393 L 370 395 L 370 396 L 372 398 L 372 399 L 374 401 L 374 402 L 377 405 L 377 406 L 394 423 L 395 423 L 398 426 L 399 426 L 407 432 L 408 432 L 417 437 L 419 437 L 422 439 L 424 439 L 425 440 L 427 440 L 428 441 L 431 441 L 432 442 L 435 442 L 436 443 L 440 443 L 441 444 L 450 444 L 451 445 L 576 445 L 576 420 L 449 420 L 448 419 L 442 419 L 441 418 L 438 418 L 437 417 L 434 417 L 433 416 L 431 416 L 428 414 L 426 414 L 425 413 L 422 412 L 420 410 L 417 409 L 411 404 L 410 404 L 396 390 L 396 389 L 393 386 L 393 385 L 391 383 L 389 378 L 387 376 L 387 374 L 385 371 L 385 369 L 384 368 L 384 366 L 383 365 L 383 363 L 382 362 L 382 358 L 381 357 L 381 351 L 380 350 L 380 308 L 381 307 L 381 300 L 382 299 L 382 296 L 383 295 L 383 292 L 384 291 L 384 289 L 386 286 L 386 284 L 387 283 L 389 278 L 391 276 L 391 275 L 393 273 L 393 272 L 395 270 L 395 269 L 401 263 L 401 262 L 411 253 L 412 253 L 420 247 L 421 247 L 426 244 L 428 244 L 429 243 L 430 243 L 431 242 L 433 242 L 434 241 L 437 241 L 438 240 L 441 240 L 442 239 L 447 239 L 448 238 L 576 238 L 576 213 L 446 213 L 445 214 L 439 214 L 438 215 L 434 215 L 433 216 L 430 216 L 429 217 L 427 217 L 426 218 L 421 219 L 418 221 L 416 221 L 415 222 L 408 225 L 406 227 L 403 228 L 397 233 L 396 233 L 392 237 Z M 404 60 L 403 60 L 402 59 L 400 59 L 399 58 L 397 58 L 396 57 L 394 57 L 393 56 L 390 56 L 389 55 L 387 55 L 386 54 L 382 54 L 381 53 L 377 53 L 376 52 L 371 52 L 370 51 L 361 51 L 360 50 L 334 50 L 333 51 L 326 51 L 325 52 L 320 52 L 319 53 L 316 53 L 315 54 L 312 54 L 311 55 L 308 55 L 307 56 L 305 56 L 302 58 L 297 59 L 296 60 L 283 66 L 281 68 L 278 69 L 276 71 L 276 124 L 277 124 L 278 125 L 286 125 L 287 126 L 294 126 L 295 127 L 303 127 L 304 128 L 312 128 L 313 129 L 321 129 L 322 130 L 330 130 L 331 131 L 339 131 L 340 132 L 348 132 L 349 133 L 357 133 L 358 134 L 366 134 L 367 135 L 375 135 L 378 137 L 378 159 L 376 161 L 375 161 L 368 165 L 366 165 L 363 167 L 360 167 L 359 168 L 356 168 L 355 169 L 351 169 L 350 170 L 344 170 L 343 171 L 319 171 L 318 170 L 310 170 L 309 169 L 305 169 L 304 168 L 300 168 L 299 167 L 296 167 L 295 166 L 292 166 L 291 165 L 288 165 L 287 164 L 285 164 L 284 163 L 279 162 L 276 160 L 276 187 L 277 187 L 278 188 L 280 188 L 281 189 L 283 189 L 284 190 L 286 190 L 287 191 L 289 191 L 290 192 L 293 192 L 294 193 L 298 193 L 299 194 L 303 194 L 304 195 L 310 195 L 311 196 L 320 196 L 321 197 L 344 197 L 345 196 L 353 196 L 354 195 L 359 195 L 360 194 L 364 194 L 365 193 L 367 193 L 368 192 L 371 192 L 372 191 L 374 191 L 375 190 L 380 189 L 383 187 L 385 187 L 386 186 L 397 181 L 399 179 L 402 178 L 405 175 L 405 122 L 404 121 L 398 121 L 397 120 L 390 120 L 389 119 L 381 119 L 380 118 L 372 118 L 371 117 L 363 117 L 362 116 L 354 116 L 353 115 L 345 115 L 344 114 L 336 114 L 335 113 L 327 113 L 326 112 L 318 112 L 317 111 L 309 111 L 308 110 L 304 110 L 303 109 L 303 87 L 312 82 L 314 82 L 315 81 L 317 81 L 318 80 L 320 80 L 321 79 L 324 79 L 325 78 L 329 78 L 330 77 L 337 77 L 338 76 L 358 76 L 359 77 L 368 77 L 369 78 L 375 78 L 376 79 L 380 79 L 381 80 L 384 80 L 385 81 L 388 81 L 389 82 L 391 82 L 392 83 L 395 83 L 396 84 L 398 84 L 401 86 L 403 86 L 404 87 L 405 87 L 405 61 Z M 192 7 L 190 7 L 189 6 L 186 6 L 185 5 L 181 5 L 180 4 L 175 4 L 174 3 L 150 3 L 149 4 L 144 4 L 143 5 L 140 5 L 139 6 L 137 6 L 136 7 L 134 7 L 133 8 L 128 9 L 127 10 L 116 15 L 114 17 L 113 17 L 105 23 L 105 65 L 103 67 L 94 67 L 93 68 L 85 68 L 84 69 L 79 69 L 79 90 L 80 91 L 104 91 L 105 92 L 105 193 L 135 193 L 135 92 L 136 91 L 192 91 L 192 66 L 136 66 L 135 65 L 135 38 L 138 35 L 139 35 L 148 30 L 151 30 L 152 29 L 155 29 L 156 28 L 164 28 L 165 27 L 170 27 L 171 28 L 180 28 L 181 29 L 185 29 L 186 30 L 189 30 L 190 31 L 193 31 L 193 8 Z M 469 85 L 470 85 L 475 82 L 477 82 L 480 80 L 482 80 L 483 79 L 486 79 L 487 78 L 492 78 L 493 77 L 514 77 L 515 78 L 519 78 L 520 79 L 523 79 L 524 80 L 529 81 L 530 82 L 531 82 L 532 83 L 534 83 L 538 86 L 541 87 L 543 89 L 543 155 L 539 158 L 538 158 L 536 160 L 535 160 L 533 162 L 532 162 L 527 165 L 525 165 L 522 167 L 520 167 L 519 168 L 516 168 L 515 169 L 511 169 L 510 170 L 501 170 L 500 171 L 499 171 L 498 170 L 487 170 L 486 169 L 483 169 L 482 168 L 477 167 L 476 166 L 471 164 L 469 162 L 468 162 L 464 158 L 464 89 Z M 215 54 L 215 193 L 244 193 L 245 192 L 245 55 L 244 54 Z M 212 3 L 212 30 L 247 30 L 247 3 Z" fill="currentColor" fill-rule="evenodd"/><g fill="none" stroke="currentColor" stroke-width="1" opacity=".23"><path d="M6 455.5H95"/><path d="M105 455.5H278"/><path d="M291 455.5H650"/></g></svg></span><span class="logo-light"><svg class="brand-logo" viewBox="0 0 655 464" role="img" aria-labelledby="fisdLogoTitle"><title id="fisdLogoTitle">FISD XC</title><path d="M 572 7 L 543 7 L 543 58 L 542 59 L 540 59 L 535 56 L 533 56 L 532 55 L 530 55 L 529 54 L 527 54 L 526 53 L 523 53 L 522 52 L 518 52 L 517 51 L 511 51 L 510 50 L 489 50 L 488 51 L 482 51 L 481 52 L 476 52 L 475 53 L 472 53 L 471 54 L 469 54 L 468 55 L 465 55 L 462 57 L 457 58 L 456 59 L 455 59 L 454 60 L 441 66 L 439 68 L 438 68 L 434 71 L 434 176 L 437 179 L 438 179 L 441 182 L 442 182 L 447 186 L 448 186 L 457 191 L 459 191 L 462 193 L 465 193 L 466 194 L 468 194 L 469 195 L 473 195 L 474 196 L 481 196 L 482 197 L 499 197 L 500 196 L 505 196 L 506 195 L 510 195 L 511 194 L 513 194 L 514 193 L 519 192 L 522 190 L 524 190 L 525 189 L 528 188 L 530 186 L 531 186 L 532 185 L 535 184 L 537 182 L 538 182 L 544 177 L 545 178 L 545 181 L 546 182 L 546 188 L 547 189 L 547 193 L 572 193 L 573 192 L 573 8 Z M 102 211 L 104 213 L 105 216 L 107 218 L 108 221 L 110 223 L 112 228 L 114 230 L 115 233 L 117 235 L 118 238 L 120 240 L 121 243 L 123 245 L 125 250 L 127 252 L 128 255 L 130 257 L 131 260 L 133 262 L 135 267 L 137 269 L 138 272 L 140 274 L 141 277 L 143 279 L 144 282 L 146 284 L 148 289 L 150 291 L 151 294 L 153 296 L 154 299 L 156 301 L 157 304 L 159 306 L 161 311 L 164 314 L 164 315 L 173 324 L 174 324 L 176 326 L 177 326 L 179 328 L 180 328 L 183 330 L 183 331 L 182 332 L 179 333 L 177 335 L 176 335 L 174 337 L 173 337 L 164 346 L 164 347 L 161 350 L 159 355 L 157 357 L 156 360 L 154 362 L 153 365 L 151 367 L 150 370 L 148 372 L 146 377 L 144 379 L 143 382 L 141 384 L 140 387 L 138 389 L 137 392 L 135 394 L 133 399 L 131 401 L 130 404 L 128 406 L 127 409 L 125 411 L 125 412 L 122 416 L 120 421 L 118 423 L 117 426 L 115 428 L 114 431 L 112 433 L 111 436 L 109 438 L 109 439 L 106 444 L 134 444 L 135 443 L 136 440 L 138 438 L 140 433 L 142 431 L 143 428 L 145 426 L 147 421 L 149 419 L 150 416 L 152 414 L 153 411 L 155 409 L 157 404 L 159 402 L 160 399 L 162 397 L 164 392 L 166 390 L 167 387 L 169 385 L 170 382 L 172 380 L 174 375 L 176 373 L 177 370 L 179 368 L 180 365 L 182 363 L 182 362 L 190 354 L 191 354 L 196 351 L 200 351 L 201 350 L 254 350 L 255 351 L 258 351 L 259 352 L 261 352 L 262 353 L 263 353 L 265 355 L 266 355 L 273 362 L 273 363 L 275 365 L 279 374 L 281 376 L 287 389 L 289 391 L 289 392 L 290 393 L 296 406 L 298 408 L 304 421 L 306 423 L 306 424 L 307 425 L 312 436 L 314 438 L 316 443 L 317 444 L 343 444 L 343 442 L 341 440 L 341 439 L 340 438 L 334 425 L 332 423 L 326 410 L 324 408 L 324 407 L 323 406 L 317 393 L 315 391 L 315 390 L 314 389 L 308 376 L 306 374 L 306 373 L 305 372 L 299 359 L 297 357 L 294 350 L 292 348 L 292 347 L 282 337 L 281 337 L 276 333 L 273 332 L 272 331 L 272 330 L 276 327 L 277 327 L 281 324 L 282 324 L 291 315 L 291 314 L 295 309 L 300 298 L 302 296 L 308 283 L 310 281 L 316 268 L 318 266 L 318 265 L 319 264 L 325 251 L 327 249 L 333 236 L 335 234 L 335 233 L 336 232 L 342 219 L 344 217 L 347 210 L 321 210 L 319 212 L 315 221 L 313 223 L 313 224 L 312 225 L 306 238 L 304 240 L 298 253 L 296 255 L 296 256 L 295 257 L 289 270 L 287 272 L 287 273 L 286 274 L 281 285 L 279 287 L 275 296 L 273 298 L 273 299 L 266 306 L 265 306 L 261 309 L 259 309 L 258 310 L 255 310 L 254 311 L 201 311 L 200 310 L 196 310 L 195 309 L 190 307 L 182 299 L 182 298 L 180 296 L 179 293 L 177 291 L 176 288 L 174 286 L 172 281 L 170 279 L 169 276 L 167 274 L 166 271 L 164 269 L 162 264 L 160 262 L 159 259 L 157 257 L 155 252 L 153 250 L 152 247 L 150 245 L 149 242 L 147 240 L 145 235 L 143 233 L 142 230 L 140 228 L 138 223 L 136 221 L 135 218 L 133 216 L 133 215 L 130 211 L 130 210 L 103 210 Z M 391 237 L 380 248 L 380 249 L 375 254 L 375 255 L 369 263 L 369 264 L 362 277 L 362 279 L 361 280 L 361 282 L 360 283 L 360 285 L 359 286 L 359 289 L 358 290 L 358 293 L 357 294 L 357 299 L 356 300 L 356 310 L 355 311 L 355 346 L 356 347 L 356 358 L 357 359 L 357 363 L 358 364 L 358 368 L 359 369 L 359 371 L 360 372 L 360 375 L 361 376 L 361 378 L 363 381 L 363 383 L 364 384 L 368 393 L 370 395 L 370 396 L 372 398 L 372 399 L 374 401 L 374 402 L 377 405 L 377 406 L 394 423 L 395 423 L 398 426 L 399 426 L 407 432 L 408 432 L 417 437 L 419 437 L 422 439 L 424 439 L 425 440 L 427 440 L 428 441 L 431 441 L 432 442 L 435 442 L 436 443 L 440 443 L 441 444 L 450 444 L 451 445 L 576 445 L 576 420 L 449 420 L 448 419 L 442 419 L 441 418 L 438 418 L 437 417 L 434 417 L 433 416 L 431 416 L 428 414 L 426 414 L 425 413 L 422 412 L 420 410 L 417 409 L 411 404 L 410 404 L 396 390 L 396 389 L 393 386 L 393 385 L 391 383 L 389 378 L 387 376 L 387 374 L 385 371 L 385 369 L 384 368 L 384 366 L 383 365 L 383 363 L 382 362 L 382 358 L 381 357 L 381 351 L 380 350 L 380 308 L 381 307 L 381 300 L 382 299 L 382 296 L 383 295 L 383 292 L 384 291 L 384 289 L 386 286 L 386 284 L 387 283 L 389 278 L 391 276 L 391 275 L 393 273 L 393 272 L 395 270 L 395 269 L 401 263 L 401 262 L 411 253 L 412 253 L 420 247 L 421 247 L 426 244 L 428 244 L 429 243 L 430 243 L 431 242 L 433 242 L 434 241 L 437 241 L 438 240 L 441 240 L 442 239 L 447 239 L 448 238 L 576 238 L 576 213 L 446 213 L 445 214 L 439 214 L 438 215 L 434 215 L 433 216 L 430 216 L 429 217 L 427 217 L 426 218 L 421 219 L 418 221 L 416 221 L 415 222 L 408 225 L 406 227 L 403 228 L 397 233 L 396 233 L 392 237 Z M 404 60 L 403 60 L 402 59 L 400 59 L 399 58 L 397 58 L 396 57 L 394 57 L 393 56 L 390 56 L 389 55 L 387 55 L 386 54 L 382 54 L 381 53 L 377 53 L 376 52 L 371 52 L 370 51 L 361 51 L 360 50 L 334 50 L 333 51 L 326 51 L 325 52 L 320 52 L 319 53 L 316 53 L 315 54 L 312 54 L 311 55 L 308 55 L 307 56 L 305 56 L 302 58 L 297 59 L 296 60 L 283 66 L 281 68 L 278 69 L 276 71 L 276 124 L 277 124 L 278 125 L 286 125 L 287 126 L 294 126 L 295 127 L 303 127 L 304 128 L 312 128 L 313 129 L 321 129 L 322 130 L 330 130 L 331 131 L 339 131 L 340 132 L 348 132 L 349 133 L 357 133 L 358 134 L 366 134 L 367 135 L 375 135 L 378 137 L 378 159 L 376 161 L 375 161 L 368 165 L 366 165 L 363 167 L 360 167 L 359 168 L 356 168 L 355 169 L 351 169 L 350 170 L 344 170 L 343 171 L 319 171 L 318 170 L 310 170 L 309 169 L 305 169 L 304 168 L 300 168 L 299 167 L 296 167 L 295 166 L 292 166 L 291 165 L 288 165 L 287 164 L 285 164 L 284 163 L 279 162 L 276 160 L 276 187 L 277 187 L 278 188 L 280 188 L 281 189 L 283 189 L 284 190 L 286 190 L 287 191 L 289 191 L 290 192 L 293 192 L 294 193 L 298 193 L 299 194 L 303 194 L 304 195 L 310 195 L 311 196 L 320 196 L 321 197 L 344 197 L 345 196 L 353 196 L 354 195 L 359 195 L 360 194 L 364 194 L 365 193 L 367 193 L 368 192 L 371 192 L 372 191 L 374 191 L 375 190 L 380 189 L 383 187 L 385 187 L 386 186 L 397 181 L 399 179 L 402 178 L 405 175 L 405 122 L 404 121 L 398 121 L 397 120 L 390 120 L 389 119 L 381 119 L 380 118 L 372 118 L 371 117 L 363 117 L 362 116 L 354 116 L 353 115 L 345 115 L 344 114 L 336 114 L 335 113 L 327 113 L 326 112 L 318 112 L 317 111 L 309 111 L 308 110 L 304 110 L 303 109 L 303 87 L 312 82 L 314 82 L 315 81 L 317 81 L 318 80 L 320 80 L 321 79 L 324 79 L 325 78 L 329 78 L 330 77 L 337 77 L 338 76 L 358 76 L 359 77 L 368 77 L 369 78 L 375 78 L 376 79 L 380 79 L 381 80 L 384 80 L 385 81 L 388 81 L 389 82 L 391 82 L 392 83 L 395 83 L 396 84 L 398 84 L 401 86 L 403 86 L 404 87 L 405 87 L 405 61 Z M 192 7 L 190 7 L 189 6 L 186 6 L 185 5 L 181 5 L 180 4 L 175 4 L 174 3 L 150 3 L 149 4 L 144 4 L 143 5 L 140 5 L 139 6 L 137 6 L 136 7 L 134 7 L 133 8 L 128 9 L 127 10 L 116 15 L 114 17 L 113 17 L 105 23 L 105 65 L 103 67 L 94 67 L 93 68 L 85 68 L 84 69 L 79 69 L 79 90 L 80 91 L 104 91 L 105 92 L 105 193 L 135 193 L 135 92 L 136 91 L 192 91 L 192 66 L 136 66 L 135 65 L 135 38 L 138 35 L 139 35 L 148 30 L 151 30 L 152 29 L 155 29 L 156 28 L 164 28 L 165 27 L 170 27 L 171 28 L 180 28 L 181 29 L 185 29 L 186 30 L 189 30 L 190 31 L 193 31 L 193 8 Z M 469 85 L 470 85 L 475 82 L 477 82 L 480 80 L 482 80 L 483 79 L 486 79 L 487 78 L 492 78 L 493 77 L 514 77 L 515 78 L 519 78 L 520 79 L 523 79 L 524 80 L 529 81 L 530 82 L 531 82 L 532 83 L 534 83 L 538 86 L 541 87 L 543 89 L 543 155 L 539 158 L 538 158 L 536 160 L 535 160 L 533 162 L 532 162 L 527 165 L 525 165 L 522 167 L 520 167 L 519 168 L 516 168 L 515 169 L 511 169 L 510 170 L 501 170 L 500 171 L 499 171 L 498 170 L 487 170 L 486 169 L 483 169 L 482 168 L 477 167 L 476 166 L 471 164 L 469 162 L 468 162 L 464 158 L 464 89 Z M 215 54 L 215 193 L 244 193 L 245 192 L 245 55 L 244 54 Z M 212 3 L 212 30 L 247 30 L 247 3 Z" fill="currentColor" fill-rule="evenodd"/><g fill="none" stroke="currentColor" stroke-width="1" opacity=".23"><path d="M6 455.5H95"/><path d="M105 455.5H278"/><path d="M291 455.5H650"/></g></svg></span><span><span class="brand-label">FISD XC / OPS</span><br><span class="brand-sub">Brand system · onchain impact operations</span></span></a><a class="bar-link" href="index.html">Open primary dashboard →</a></div>
+<div class="shell">
+
+<header class="header">
+  <div class="wordmark" style="display:flex;align-items:center;gap:12px"><img class="fisd-logo-inline" src="assets/fisd-xc-dark.svg" alt="FISD XC" data-dark-src="assets/fisd-xc-dark.svg" data-light-src="assets/fisd-xc-light.svg"><span>FISD XC <small>FUTURISTIC IMPACT SCHEDULE DASHBOARD</small></span></div>
+  <div class="header-right">
+    <div class="live"><b></b>live system</div>
+    <button class="btn" id="themeBtn">light mode</button>
+    <button class="btn" id="resetBtn">reset</button>
+  </div>
+</header>
+
+<section class="program">
+  <aside class="rail">
+    <div class="rail-title">PROGRAM CORE</div>
+    <div class="rail-copy">A persistent visual layer for understanding how work unfolds and how its effects propagate.</div>
+    <div class="rail-meta">MODEL<br>EVENT → TIME → EFFECT<br><br>MODE<br>OBSERVE / INSPECT / EDIT</div>
+  </aside>
+
+  <div class="stage">
+    <section class="impact" id="impactField">
+      <div class="field-title">IMPACT FIELD</div>
+      <div class="now-field"><span>NOW</span></div>
+      <div id="impactLinks"></div>
+      <div class="field-footer">ACCUMULATED EFFECT · SEQUENTIAL RELATIONSHIP</div>
+    </section>
+
+    <section class="timeline-stage">
+      <svg id="viz" viewBox="0 0 1400 540" preserveAspectRatio="none" aria-label="FISD timescale">
+        <g id="connectors"></g>
+        <g id="axis"></g>
+        <g id="events"></g>
+        <text x="18" y="300" text-anchor="middle" class="section-text" transform="rotate(-90 18 300)">CONNECTORS</text>
+        <text x="18" y="475" text-anchor="middle" class="section-text" transform="rotate(-90 18 475)">TIME SCALES</text>
+      </svg>
+    </section>
+  </div>
+</section>
+
+<section class="inspect" id="inspect">
+  <div class="empty">select an impact or event to inspect its relationship</div>
+</section>
+
+<section class="entry">
+  <div class="entry-head">
+    <div class="entry-title">PROGRAM INPUT · ADD / LINK ITEM</div>
+    <div class="entry-count" id="count"></div>
+  </div>
+  <form class="form" id="form">
+    <input class="field" id="name" required placeholder="item / event name">
+    <input class="field" id="url" placeholder="reference / URL">
+    <input class="field" id="start" type="number" min="0" max="100" value="50" placeholder="start %">
+    <input class="field" id="duration" type="number" min="5" max="100" value="30" placeholder="duration %">
+    <input class="field" id="impact" type="number" min="10" max="100" value="50" placeholder="impact">
+    <select class="field" id="type"><option>event</option><option>decision</option><option>milestone</option><option>risk</option><option>signal</option></select>
+    <button class="add">ADD TO SCHEDULE</button>
+  </form>
+  <div class="note">The lower schedule is the source of truth. Its temporal position, duration and impact continuously generate the upper field.</div>
+  <div class="chips" id="chips"></div>
+</section>
+
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+const NS="http://www.w3.org/2000/svg";
+const svg=document.getElementById("viz");
+const connectors=document.getElementById("connectors");
+const events=document.getElementById("events");
+const axis=document.getElementById("axis");
+const field=document.getElementById("impactField");
+const impactLinks=document.getElementById("impactLinks");
+const tip=document.getElementById("tip");
+const inspect=document.getElementById("inspect");
+
+const seed=[
+["market research",6,29,28,"event"],
+["user interviews",15,38,36,"event"],
+["product strategy",25,47,64,"decision"],
+["prototyping",37,33,42,"milestone"],
+["beta testing",48,25,34,"event"],
+["review",55,31,57,"decision"],
+["launch",65,25,78,"milestone"],
+["growth campaign",76,42,58,"event"],
+["feedback",87,25,44,"signal"],
+["iteration",93,31,52,"event"]
+];
+
+let items=JSON.parse(localStorage.getItem("fisdItems")||"null") ||
+ seed.map(x=>({name:x[0],start:x[1],duration:x[2],impact:x[3],type:x[4],url:""}));
+let selected=null;
+
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function el(tag,attrs={}){
+ const n=document.createElementNS(NS,tag);
+ for(const [k,v] of Object.entries(attrs))n.setAttribute(k,v);
+ return n;
+}
+function save(){localStorage.setItem("fisdItems",JSON.stringify(items))}
+function svgX(v){return 95+(v/100)*1250}
+function rowY(i){return 115+(i%5)*62+((i*17)%18)}
+
+function renderImpact(){
+ impactLinks.innerHTML="";
+ field.querySelectorAll(".impact-node").forEach(n=>n.remove());
+
+ const pos=items.map((item,i)=>{
+   const mid=item.start+item.duration/2;
+   const near=1-Math.min(1,Math.abs(mid-50)/50);
+   const x=5+item.start*.9;
+   const y=72-(item.impact*.43)-(item.duration*.07)+(near*8);
+   const size=28+item.impact*.7+item.duration*.13;
+   return {x:clamp(x,3,97),y:clamp(y,13,76),size,item,i,mid};
+ });
+
+ // Sequential radial binding: each impact is linked only to the next impact.
+ for(let i=0;i<pos.length-1;i++){
+   const a=pos[i],b=pos[i+1];
+   const ax=field.clientWidth*a.x/100,ay=field.clientHeight*a.y/100;
+   const bx=field.clientWidth*b.x/100,by=field.clientHeight*b.y/100;
+   const dx=bx-ax,dy=by-ay,len=Math.hypot(dx,dy);
+   const link=document.createElement("div");
+   link.className="impact-link";
+   link.dataset.a=i;link.dataset.b=i+1;
+   link.style.left=ax+"px";link.style.top=ay+"px";
+   link.style.width=Math.max(10,len-(a.size+b.size)*.34)+"px";
+   link.style.transform=`rotate(${Math.atan2(dy,dx)*180/Math.PI}deg)`;
+   impactLinks.appendChild(link);
+ }
+
+ pos.forEach(p=>{
+   const n=document.createElement("button");
+   n.className="impact-node";
+   n.dataset.index=p.i;
+   n.style.left=p.x+"%";n.style.top=p.y+"%";
+   n.style.width=p.size+"px";n.style.height=p.size+"px";
+   n.style.opacity=String(.38+(1-Math.min(1,Math.abs(p.mid-50)/50))*.62);
+   n.innerHTML=`<span class="impact-number">${p.item.impact}</span><span class="impact-name">${esc(p.item.name)}</span>`;
+   if(selected===p.i)n.classList.add("selected");
+   n.onclick=()=>select(p.i);
+   n.onmouseenter=e=>showTip(e,p.item);
+   n.onmousemove=moveTip;
+   n.onmouseleave=hideTip;
+   field.appendChild(n);
+ });
+ focusLinks();
+}
+
+function renderTimeline(){
+ connectors.innerHTML="";events.innerHTML="";axis.innerHTML="";
+ const W=1400, left=95,right=1345,axisY=445;
+
+ const months=["APR","MAY","JUN","JUL","AUG","SEP","OCT"];
+ axis.appendChild(el("line",{x1:left,y1:axisY,x2:right,y2:axisY,class:"axis-line"}));
+ months.forEach((m,i)=>{
+   const x=left+(i/6)*(right-left);
+   axis.appendChild(el("line",{x1:x,y1:axisY-5,x2:x,y2:axisY+6,class:"axis-tick"}));
+   const t=el("text",{x,y:axisY-16,"text-anchor":"middle",class:"axis-text"});t.textContent=m;axis.appendChild(t);
+   const grid=el("line",{x1:x,y1:72,x2:x,y2:axisY,class:"axis-line",opacity:.28,"stroke-dasharray":"2 6"});axis.appendChild(grid);
+ });
+ const nowX=left+.5*(right-left);
+ axis.appendChild(el("line",{x1:nowX,y1:70,x2:nowX,y2:axisY+28,class:"now-svg"}));
+ const nt=el("text",{x:nowX,y:65,"text-anchor":"middle",class:"now-svg-label"});nt.textContent="NOW";axis.appendChild(nt);
+
+ items.forEach((item,i)=>{
+   const x=svgX(item.start);
+   const y=rowY(i);
+   const end=svgX(clamp(item.start+item.duration,0,100));
+   const barY=y+15;
+
+   // Smooth independent connector. No common top binding point.
+   // The impact field has the corresponding sequential node above.
+   const targetX=x;
+   const path=el("path",{
+     d:`M ${x} ${barY} C ${x} ${barY-58}, ${x-34} 84, ${targetX} 0`,
+     class:"connector","data-index":i
+   });
+   connectors.appendChild(path);
+
+   const line=el("line",{x1:x,x2:x,y1:y-25,y2:barY+25,class:"event-line","data-index":i});
+   events.appendChild(line);
+
+   const bar=el("rect",{x:x,y:barY-4,width:Math.max(7,end-x),height:8,rx:4,class:"event-bar","data-index":i});
+   events.appendChild(bar);
+
+   const label=el("text",{x:Math.max(70,x-8),y:barY+4,"text-anchor":"end",class:"event-label","data-index":i});
+   label.textContent=item.name.toUpperCase();events.appendChild(label);
+
+   [line,bar,label].forEach(n=>{
+     n.addEventListener("click",()=>select(i));
+     n.addEventListener("mouseenter",e=>showTip(e,item));
+     n.addEventListener("mousemove",moveTip);
+     n.addEventListener("mouseleave",hideTip);
+   });
+ });
+ if(selected!==null)applyFocus();
+}
+
+function renderInspect(){
+ if(selected===null){
+   inspect.innerHTML='<div class="empty">select an impact or event to inspect its relationship</div>';return;
+ }
+ const a=items[selected],end=clamp(a.start+a.duration,0,100);
+ inspect.innerHTML=`
+ <div><div class="cap">SELECTED</div><div class="val">${esc(a.name)}</div></div>
+ <div><div class="cap">START</div><div class="val">${a.start}%</div></div>
+ <div><div class="cap">DURATION</div><div class="val">${a.duration}%</div></div>
+ <div><div class="cap">IMPACT</div><div class="val">${a.impact}%</div></div>
+ <div><div class="cap">RELATIONSHIP</div><div class="desc">${esc(a.type)} · temporal span ${a.start}% → ${end}% · effect magnitude ${a.impact}%${a.url?` · reference available`:""}</div></div>
+ ${a.url?`<button id="openRef">OPEN REFERENCE ↗</button>`:"<button id="removeSelected">REMOVE</button>"}`;
+ const open=document.getElementById("openRef");
+ if(open)open.onclick=()=>{try{const u=new URL(a.url);if(/^https?:$/.test(u.protocol))window.open(u.href,"_blank","noopener")}catch{}};
+ const rem=document.getElementById("removeSelected");
+ if(rem)rem.onclick=removeSelected;
+}
+
+function applyFocus(){
+ document.querySelectorAll("[data-index]").forEach(n=>{
+   const same=Number(n.dataset.index)===selected;
+   n.classList.toggle("dim",selected!==null&&!same);
+   n.classList.toggle("focus",selected!==null&&same);
+ });
+ focusLinks();
+}
+function focusLinks(){
+ document.querySelectorAll(".impact-link").forEach(n=>{
+   const a=+n.dataset.a,b=+n.dataset.b;
+   n.classList.toggle("dim",selected!==null&&a!==selected&&b!==selected);
+   n.classList.toggle("focus",selected!==null&&(a===selected||b===selected));
+ });
+}
+function select(i){selected=selected===i?null:i;renderImpact();renderTimeline();renderInspect()}
+function removeSelected(){
+ if(selected===null)return;
+ items.splice(selected,1);selected=null;render();
+}
+function renderChips(){
+ const c=document.getElementById("chips");c.innerHTML="";
+ items.forEach((a,i)=>{
+   const d=document.createElement("div");d.className="chip";
+   d.innerHTML=`<i></i><span>${esc(a.name)}</span><button>×</button>`;
+   d.querySelector("button").onclick=()=>{items.splice(i,1);if(selected===i)selected=null;render()};
+   d.onclick=e=>{if(e.target.tagName!=="BUTTON")select(i)};
+   c.appendChild(d);
+ });
+ document.getElementById("count").textContent=items.length+" active items";
+}
+function render(){save();renderImpact();renderTimeline();renderInspect();renderChips()}
+function showTip(e,a){
+ tip.innerHTML=`<b>${esc(a.name)}</b><br>${a.type} · start ${a.start}% · duration ${a.duration}% · impact ${a.impact}%`;
+ tip.style.display="block";moveTip(e);
+}
+function moveTip(e){tip.style.left=(e.clientX+14)+"px";tip.style.top=(e.clientY+14)+"px"}
+function hideTip(){tip.style.display="none"}
+
+document.getElementById("form").addEventListener("submit",e=>{
+ e.preventDefault();
+ items.push({
+  name:document.getElementById("name").value.trim()||"untitled",
+  url:document.getElementById("url").value.trim(),
+  start:clamp(+document.getElementById("start").value||50,0,100),
+  duration:clamp(+document.getElementById("duration").value||30,5,100),
+  impact:clamp(+document.getElementById("impact").value||50,10,100),
+  type:document.getElementById("type").value
+ });
+ selected=items.length-1;
+ e.target.reset();
+ document.getElementById("start").value=50;
+ document.getElementById("duration").value=30;
+ document.getElementById("impact").value=50;
+ render();
+});
+
+document.getElementById("themeBtn").onclick=()=>{
+ const light=document.body.dataset.theme==="light";
+ document.body.dataset.theme=light?"dark":"light";
+ document.getElementById("themeBtn").textContent=light?"light mode":"dark mode";
+ render();
+};
+document.getElementById("resetBtn").onclick=()=>{
+ items=seed.map(x=>({name:x[0],start:x[1],duration:x[2],impact:x[3],type:x[4],url:""}));
+ selected=null;render();
+};
+window.addEventListener("resize",renderImpact);
+render();
+</script>
+<script>(function(){function syncFisdMark(){var light=document.body&&document.body.dataset.theme==="light";document.querySelectorAll(".fisd-logo-inline").forEach(function(img){img.src=light?(img.dataset.lightSrc||"assets/fisd-xc-light.svg"):(img.dataset.darkSrc||"assets/fisd-xc-dark.svg")});}syncFisdMark();if(window.MutationObserver&&document.body)new MutationObserver(syncFisdMark).observe(document.body,{attributes:true,attributeFilter:["data-theme"]});})();</script>
+</body>
+</html>
