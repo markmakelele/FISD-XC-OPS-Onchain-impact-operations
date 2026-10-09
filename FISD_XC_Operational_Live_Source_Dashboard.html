@@ -341,13 +341,22 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid 
   .source-preview{grid-template-columns:1fr}
 }
 
+/* FISD XC shared brand system */
+:root{--bg:#08090C;--fg:#F3F4F5;--muted:#A3A9B4;--line:#292E38;--line2:#49515E;--panel:#0E1015;--input:#12151B;--field:#12151B;--accent:#BDCBD4;--soft:rgba(189,203,212,.12)}
+[data-theme="light"]{--bg:#F8F8F5;--fg:#11110F;--muted:#5E5E58;--line:#C9C9C3;--line2:#858C8E;--panel:#FFF;--input:#F0F1ED;--field:#F0F1ED;--accent:#425A65;--soft:rgba(66,90,101,.10)}
+.fisd-logo-inline{width:clamp(42px,4.5vw,58px);height:auto;max-height:48px;object-fit:contain;display:inline-block;vertical-align:middle;flex:0 0 auto}
+.wordmark,.top .title{display:flex;align-items:center;gap:12px}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
 </style>
+<link rel="stylesheet" href="assets/brand-tokens.css"><link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 </head>
 <body data-theme="dark">
 <div class="shell">
 
 <header class="header">
-  <div class="wordmark">FISD XC <small>FUTURISTIC IMPACT SCHEDULE DASHBOARD</small></div>
+  <div class="wordmark"><img class="fisd-logo-inline" src="assets/fisd-xc-dark.svg" data-dark-src="assets/fisd-xc-dark.svg" data-light-src="assets/fisd-xc-light.svg" alt="FISD XC"><span>FISD XC <small>FUTURISTIC IMPACT SCHEDULE DASHBOARD</small></span></div>
   <div class="header-right">
     <div class="live"><b></b>live system</div>
     <button class="btn primary" id="sourceBtn">add source</button>
