@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Impact Schedule — Live Dashboard</title>
+<style>
+@font-face{
+  font-family:DashMono;
+  src:local("IBM Plex Mono"),local("SFMono-Regular"),local("Consolas"),monospace;
+}
+:root{
+  --bg:#050505; --fg:#f4f4f0; --muted:#8c8c87;
+  --line:#3a3a37; --line2:#777770; --panel:#0c0c0b; --input:#111110;
+  --soft:rgba(244,244,240,.07); --shadow:rgba(0,0,0,.45);
+}
+[data-theme="light"]{
+  --bg:#f5f5f1; --fg:#11110f; --muted:#777770;
+  --line:#c7c7c0; --line2:#87877f; --panel:#fff; --input:#ebebe7;
+  --soft:rgba(17,17,15,.07); --shadow:rgba(0,0,0,.12);
+}
+*{box-sizing:border-box}
+html{background:var(--bg);scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--fg);
+  font-family:DashMono,ui-monospace,monospace;
+  letter-spacing:.12em;font-size:12px;min-height:100vh;
+}
+button,input,select{font:inherit;color:inherit;letter-spacing:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:1px solid var(--fg);outline-offset:2px}
+.app{max-width:1600px;margin:auto;padding:24px 30px 30px}
+.top{
+  height:52px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.title{font-size:12px;letter-spacing:.48em;text-transform:lowercase}
+.top-actions{display:flex;gap:8px}
+.btn{
+  border:1px solid var(--line2);background:transparent;padding:9px 12px;
+  font-size:9px;text-transform:lowercase;
+}
+.btn:hover{background:var(--fg);color:var(--bg)}
+.live{
+  display:flex;align-items:center;gap:8px;color:var(--muted);font-size:8px;
+  margin-right:5px;
+}
+.live i{width:6px;height:6px;border-radius:50%;background:var(--fg);display:block;animation:pulse 1.8s infinite}
+@keyframes pulse{50%{opacity:.25;transform:scale(.65)}}
+
+/* IMPACT FIELD */
+.impact{
+  height:350px;position:relative;border-bottom:1px solid var(--line);
+  overflow:hidden;
+}
+.impact-grid{
+  position:absolute;inset:0;
+  background:
+    linear-gradient(var(--soft) 1px,transparent 1px) 0 50%/100% 50% no-repeat;
+  opacity:.28;pointer-events:none;
+}
+.field-label{
+  position:absolute;left:18px;top:28px;
+  font-size:9px;letter-spacing:.32em;color:var(--muted);
+  writing-mode:vertical-rl;transform:rotate(180deg);
+}
+.now-line{
+  position:absolute;top:0;bottom:0;width:1px;background:var(--line2);
+  opacity:.35;left:50%;
+}
+.now-tag{
+  position:absolute;top:8px;left:50%;transform:translateX(8px);
+  font-size:7px;color:var(--muted);letter-spacing:.2em;
+}
+.impact-node{
+  position:absolute;border:1px solid var(--fg);border-radius:50%;
+  transform:translate(-50%,-50%);
+  display:flex;align-items:center;justify-content:center;
+  transition:left .45s cubic-bezier(.2,.8,.2,1),top .45s cubic-bezier(.2,.8,.2,1),
+             width .35s,height .35s,opacity .35s,box-shadow .35s;
+  cursor:pointer;
+}
+.radial-layer{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.radial-link{position:absolute;height:1px;background:var(--line2);transform-origin:0 50%;opacity:.42;transition:opacity .25s,background .25s,height .25s}
+.radial-link::after{content:"";position:absolute;right:-1px;top:50%;width:4px;height:4px;border-radius:50%;background:var(--line2);transform:translate(50%,-50%)}
+.radial-link.dim{opacity:.08}
+.radial-link.focus{opacity:.9;background:var(--fg);height:1.5px}
+.radial-link.focus::after{background:var(--fg)}
+.feed-layer{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.feed-link{position:absolute;width:1px;background:var(--line2);opacity:.34}
+.feed-link::after{content:"";position:absolute;left:50%;bottom:-2px;width:5px;height:5px;border:1px solid var(--line2);border-radius:50%;transform:translateX(-50%);background:var(--bg)}
+.feed-link.dim{opacity:.07}.feed-link.focus{opacity:.9;background:var(--fg)}.feed-link.focus::after{border-color:var(--fg)}
+
+.impact-node::after{
+  content:"";position:absolute;inset:18%;border:1px solid var(--line2);
+  border-radius:50%;opacity:.55;
+}
+.impact-node.active{
+  box-shadow:0 0 0 7px var(--soft),0 0 22px rgba(255,255,255,.12);
+}
+.impact-node.selected{background:var(--fg);color:var(--bg);box-shadow:0 0 0 8px var(--soft)}
+.impact-node .node-name{
+  position:absolute;top:calc(100% + 9px);white-space:nowrap;
+  font-size:7px;letter-spacing:.14em;color:var(--muted);pointer-events:none;
+}
+.impact-node.selected .node-name{color:var(--fg)}
+.impact-center{
+  position:absolute;left:50%;bottom:19px;transform:translateX(-50%);
+  color:var(--muted);font-size:8px;letter-spacing:.2em;
+}
+.tooltip{
+  position:fixed;display:none;z-index:30;pointer-events:none;
+  background:var(--fg);color:var(--bg);padding:10px 12px;
+  font-size:8px;line-height:1.8;letter-spacing:.1em;max-width:280px;
+  box-shadow:0 10px 30px var(--shadow);
+}
+
+/* CONNECTORS + TIMELINE */
+.visual{
+  position:relative;height:590px;
+  border-bottom:1px solid var(--line);
+}
+svg{width:100%;height:100%;display:block}
+.connector{
+  fill:none;stroke:var(--line2);stroke-width:1.1;
+  vector-effect:non-scaling-stroke;transition:stroke .2s,stroke-width .2s,opacity .2s;
+}
+.connector.dim{opacity:.16}
+.connector.focus{stroke:var(--fg);stroke-width:2}
+.timeline{
+  stroke:var(--line2);stroke-width:1;vector-effect:non-scaling-stroke;
+  transition:stroke .2s,opacity .2s;
+}
+.timeline.dim{opacity:.15}
+.timeline.focus{stroke:var(--fg);stroke-width:2}
+.node{
+  fill:var(--fg);cursor:pointer;transition:transform .2s,opacity .2s;
+}
+.node.dim{opacity:.18}
+.node.focus{filter:drop-shadow(0 0 7px var(--fg))}
+.axis{
+  stroke:var(--line);stroke-width:1;vector-effect:non-scaling-stroke;
+}
+.axis-text{fill:var(--muted);font-size:8px;letter-spacing:.12em}
+.section-label{
+  fill:var(--muted);font-size:9px;letter-spacing:.4em;
+}
+.today-label{fill:var(--fg);font-size:8px;letter-spacing:.18em}
+
+/* DETAIL STRIP */
+.detail{
+  min-height:92px;border-bottom:1px solid var(--line);
+  display:grid;grid-template-columns:1.4fr .8fr .8fr .8fr 2fr;
+  align-items:center;gap:18px;padding:16px 0;
+}
+.detail .cap{font-size:7px;color:var(--muted);margin-bottom:7px}
+.detail .val{font-size:10px;letter-spacing:.12em}
+.detail .description{font-size:8px;color:var(--muted);line-height:1.8;letter-spacing:.1em}
+.empty-detail{grid-column:1/-1;color:var(--muted);font-size:8px;text-align:center}
+
+/* INPUT */
+.entry{padding:22px 0 0}
+.entry-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.entry-title{font-size:9px;letter-spacing:.35em}
+.entry-meta{font-size:7px;color:var(--muted)}
+.form{
+  display:grid;grid-template-columns:1.5fr 1.7fr .7fr .75fr .7fr .9fr auto;
+  gap:7px;
+}
+.field{
+  min-width:0;background:var(--input);border:1px solid var(--line);
+  padding:12px 11px;font-size:8px;outline:none;
+}
+.field::placeholder{color:var(--muted)}
+.field:hover{border-color:var(--line2)}
+.add{
+  border:1px solid var(--fg);background:var(--fg);color:var(--bg);
+  padding:12px 16px;font-size:8px;white-space:nowrap;
+}
+.add:hover{background:transparent;color:var(--fg)}
+.help{margin-top:9px;font-size:7px;color:var(--muted);letter-spacing:.1em}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.chip{
+  border:1px solid var(--line);background:var(--panel);padding:7px 9px;
+  font-size:7px;display:flex;gap:8px;align-items:center;
+}
+.chip .mark{width:5px;height:5px;border-radius:50%;background:var(--fg)}
+.chip button{border:0;background:none;padding:0;color:var(--muted)}
+.chip button:hover{color:var(--fg)}
+
+@media(max-width:1050px){
+  .form{grid-template-columns:1fr 1fr 1fr 1fr}
+  .form .add{grid-column:4}
+  .detail{grid-template-columns:1fr 1fr}
+  .detail .description{grid-column:1/-1}
+}
+@media(max-width:700px){
+  .app{padding:15px}
+  .top{height:46px}
+  .title{font-size:10px;letter-spacing:.32em}
+  .live{display:none}
+  .impact{height:290px}
+  .visual{height:530px}
+  .form{grid-template-columns:1fr 1fr}
+  .form .add{grid-column:1/-1}
+  .detail{grid-template-columns:1fr 1fr}
+}
+@media(max-width:460px){
+  .form{grid-template-columns:1fr}
+  .form .add{grid-column:auto}
+  .impact{height:250px}
+  .visual{height:500px}
+}
+</style>
+</head>
+
+<body data-theme="dark">
+<div class="app">
+
+<header class="top">
+  <div class="title">impact schedule</div>
+  <div class="top-actions">
+    <div class="live"><i></i><span>live field</span></div>
+    <button class="btn" id="theme">light mode</button>
+    <button class="btn" id="reset">reset</button>
+  </div>
+</header>
+
+<!-- The upper field is calculated from the timeline below. -->
+<section class="impact" id="impactField" aria-label="Live impact field">
+  <div class="impact-grid"></div>
+  <div class="field-label">impact field</div>
+  <div class="now-line"></div>
+  <div class="now-tag">now</div>
+  <div class="radial-layer" id="radialLayer"></div>
+  <div class="feed-layer" id="feedLayer"></div>
+  <div class="impact-center">accumulated consequence</div>
+</section>
+
+<section class="visual" aria-label="Timeline and causal connectors">
+  <svg id="svg" viewBox="0 0 1200 590" preserveAspectRatio="none">
+    <g id="connectorLayer"></g>
+    <g id="axisLayer"></g>
+    <g id="timelineLayer"></g>
+    <text x="24" y="295" text-anchor="middle" class="section-label" transform="rotate(-90 24 295)">connectors</text>
+    <text x="24" y="510" text-anchor="middle" class="section-label" transform="rotate(-90 24 510)">time scales</text>
+  </svg>
+</section>
+
+<section class="detail" id="detail">
+  <div class="empty-detail">select an impact or timescale to inspect its relationship</div>
+</section>
+
+<section class="entry">
+  <div class="entry-head">
+    <div class="entry-title">add / link item</div>
+    <div class="entry-meta" id="count">18 live items</div>
+  </div>
+
+  <form class="form" id="form">
+    <input class="field" id="name" required placeholder="item / event name" aria-label="Item name">
+    <input class="field" id="url" placeholder="URL / reference (optional)" aria-label="URL">
+    <input class="field" id="start" type="number" min="0" max="100" value="50" placeholder="start %" aria-label="Start">
+    <input class="field" id="duration" type="number" min="5" max="100" value="35" placeholder="duration %" aria-label="Duration">
+    <input class="field" id="impact" type="number" min="10" max="100" value="45" placeholder="impact %" aria-label="Impact">
+    <select class="field" id="type" aria-label="Type">
+      <option>event</option><option>decision</option><option>milestone</option><option>risk</option><option>signal</option>
+    </select>
+    <button class="add" type="submit">+ connect</button>
+  </form>
+  <div class="help">change start, duration or impact and the upper field recalculates immediately · links are retained as references</div>
+  <div class="chips" id="chips"></div>
+</section>
+
+</div>
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const NS="http://www.w3.org/2000/svg";
+const svg=document.getElementById("svg");
+const connectorLayer=document.getElementById("connectorLayer");
+const timelineLayer=document.getElementById("timelineLayer");
+const axisLayer=document.getElementById("axisLayer");
+const field=document.getElementById("impactField");
+const tooltip=document.getElementById("tooltip");
+const detail=document.getElementById("detail");
+
+const initial=[
+ {name:"brief",start:7,duration:31,impact:28,type:"event",url:""},
+ {name:"research",start:14,duration:45,impact:36,type:"event",url:""},
+ {name:"strategy",start:22,duration:38,impact:58,type:"decision",url:""},
+ {name:"prototype",start:30,duration:52,impact:45,type:"milestone",url:""},
+ {name:"test",start:37,duration:32,impact:31,type:"event",url:""},
+ {name:"review",start:44,duration:46,impact:62,type:"decision",url:""},
+ {name:"handoff",start:51,duration:29,impact:42,type:"milestone",url:""},
+ {name:"launch",start:57,duration:25,impact:92,type:"milestone",url:""},
+ {name:"measure",start:64,duration:38,impact:49,type:"event",url:""},
+ {name:"iterate",start:70,duration:45,impact:38,type:"event",url:""},
+ {name:"report",start:77,duration:33,impact:55,type:"event",url:""},
+ {name:"archive",start:84,duration:40,impact:29,type:"event",url:""},
+ {name:"signal",start:91,duration:28,impact:44,type:"signal",url:""},
+ {name:"feedback",start:96,duration:37,impact:35,type:"event",url:""},
+ {name:"context",start:27,duration:27,impact:25,type:"signal",url:""},
+ {name:"decision",start:61,duration:43,impact:64,type:"decision",url:""},
+ {name:"impact",start:74,duration:36,impact:78,type:"signal",url:""},
+ {name:"next",start:81,duration:48,impact:41,type:"event",url:""}
+];
+
+let items=JSON.parse(localStorage.getItem("impactScheduleItems")||"null")||initial.map(x=>({...x}));
+let selected=null;
+
+function S(tag,attrs={}){
+  const n=document.createElementNS(NS,tag);
+  Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));
+  return n;
+}
+function save(){localStorage.setItem("impactScheduleItems",JSON.stringify(items))}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function xFor(start){return 110+(start/100)*980}
+function getTimelineY(i){
+  return 105 + (i%5)*78 + ((i*31)%24);
+}
+
+/* Upper field is derived from the schedule:
+   - x follows the event's temporal position
+   - y follows impact + distance from "now"
+   - size follows impact
+   - duration contributes to vertical drift
+*/
+function renderImpactField(){
+  field.querySelectorAll(".impact-node").forEach(n=>n.remove());
+  const radialLayer=document.getElementById("radialLayer"), feedLayer=document.getElementById("feedLayer");
+  radialLayer.innerHTML=""; feedLayer.innerHTML="";
+  const now=50, positions=[];
+  items.forEach((item,i)=>{
+    const temporal=item.start+item.duration/2, proximity=1-Math.min(1,Math.abs(temporal-now)/100);
+    const magnitude=(item.impact/100)*.72+proximity*.28;
+    const x=clamp(7+item.start*.86,5,95), y=clamp(76-magnitude*58-(item.duration/100)*8,14,76);
+    const size=22+item.impact*.72+item.duration*.16; positions.push({x,y,size,item,i,temporal});
+  });
+  positions.forEach((p,i)=>{
+    const xPx=field.clientWidth*p.x/100, yPx=field.clientHeight*p.y/100;
+    const feed=document.createElement("div"); feed.className="feed-link"; feed.dataset.index=i;
+    feed.style.left=xPx+"px"; feed.style.top=yPx+"px"; feed.style.height=Math.max(20,field.clientHeight-yPx+2)+"px";
+    feedLayer.appendChild(feed);
+  });
+  for(let i=0;i<positions.length-1;i++){
+    const a=positions[i],b=positions[i+1];
+    const ax=field.clientWidth*a.x/100,ay=field.clientHeight*a.y/100,bx=field.clientWidth*b.x/100,by=field.clientHeight*b.y/100;
+    const dx=bx-ax,dy=by-ay,len=Math.hypot(dx,dy);
+    const link=document.createElement("div"); link.className="radial-link"; link.dataset.a=i; link.dataset.b=i+1;
+    link.style.left=ax+"px"; link.style.top=ay+"px"; link.style.width=Math.max(8,len-(a.size+b.size)*.34)+"px";
+    link.style.transform=`rotate(${Math.atan2(dy,dx)*180/Math.PI}deg)`;
+    link.style.opacity=String(clamp(.55-Math.abs(b.temporal-a.temporal)/180,.18,.55)); radialLayer.appendChild(link);
+  }
+  positions.forEach(({x,y,size,item,i,temporal})=>{
+    const node=document.createElement("button"); node.className="impact-node"; node.dataset.index=i;
+    node.style.left=x+"%";node.style.top=y+"%";node.style.width=size+"px";node.style.height=size+"px";
+    node.style.opacity=String(.38+(1-Math.min(1,Math.abs(temporal-now)/100))*.62);
+    node.setAttribute("aria-label",item.name+" impact"); node.innerHTML=`<span class="node-name">${escapeHtml(item.name)}</span>`;
+    if(selected===i)node.classList.add("selected"); if(Math.abs(temporal-now)<18)node.classList.add("active");
+    node.addEventListener("mouseenter",e=>showTip(e,item));node.addEventListener("mousemove",moveTip);node.addEventListener("mouseleave",hideTip);node.addEventListener("click",()=>select(i));
+    field.appendChild(node);
+  }); applyRadialFocus();
+}
+function applyRadialFocus(){
+  document.querySelectorAll(".radial-link").forEach(link=>{const a=+link.dataset.a,b=+link.dataset.b;link.classList.toggle("dim",selected!==null&&a!==selected&&b!==selected);link.classList.toggle("focus",selected!==null&&(a===selected||b===selected));});
+  document.querySelectorAll(".feed-link").forEach(link=>{const i=+link.dataset.index;link.classList.toggle("dim",selected!==null&&i!==selected);link.classList.toggle("focus",selected!==null&&i===selected);});
+}
+
+function renderAxis(){
+  axisLayer.innerHTML="";
+  const y=510;
+  axisLayer.appendChild(S("line",{x1:110,y1:y,x2:1090,y2:y,class:"axis"}));
+  ["0","20","40","60","80","100"].forEach((v,k)=>{
+    const x=110+(k/5)*980;
+    axisLayer.appendChild(S("line",{x1:x,y1:y-5,x2:x,y2:y+5,class:"axis"}));
+    const t=S("text",{x:x,y:y+22,"text-anchor":"middle",class:"axis-text"});
+    t.textContent=v+"%";
+    axisLayer.appendChild(t);
+  });
+  const t=S("text",{x:600,y:y+43,"text-anchor":"middle",class:"today-label"});
+  t.textContent="temporal position";
+  axisLayer.appendChild(t);
+}
+
+function renderTimeline(){
+  connectorLayer.innerHTML="";
+  timelineLayer.innerHTML="";
+  renderAxis();
+
+  const points=[];
+  items.forEach((item,i)=>{
+    const x=xFor(item.start);
+    const y=getTimelineY(i);
+    const endX=xFor(clamp(item.start+item.duration,0,100));
+    const nodeY=y+clamp(item.duration*.55,22,52);
+    points.push({x,y,nodeY,endX,item,i});
+
+    /* connector: timeline origin -> branching point -> upper impact field */
+    const branchX=x + ((i%3)-1)*42;
+    const path=S("path",{
+      d:`M ${x} ${y} L ${x} 70 L ${branchX} 48 L ${x} 0`,
+      class:"connector", "data-index":i
+    });
+    connectorLayer.appendChild(path);
+
+    const line=S("line",{x1:x,x2:x,y1:y,y2:nodeY+48,class:"timeline","data-index":i});
+    timelineLayer.appendChild(line);
+
+    const r=2.5+item.impact/18;
+    const node=S("rect",{
+      x:x-r,y:nodeY-r*1.8,width:r*2,height:r*3.6,rx:r,ry:r,
+      class:"node","data-index":i
+    });
+    node.addEventListener("mouseenter",e=>showTip(e,item));
+    node.addEventListener("mousemove",moveTip);
+    node.addEventListener("mouseleave",hideTip);
+    node.addEventListener("click",()=>select(i));
+    timelineLayer.appendChild(node);
+
+    const dur=S("line",{x1:x,y1:nodeY+62,x2:endX,y2:nodeY+62,class:"axis","data-index":i});
+    timelineLayer.appendChild(dur);
+  });
+
+  if(selected!==null) applyFocus();
+}
+
+function renderDetail(){
+  if(selected===null){
+    detail.innerHTML='<div class="empty-detail">select an impact or timescale to inspect its relationship</div>';
+    return;
+  }
+  const item=items[selected];
+  const end=clamp(item.start+item.duration,0,100);
+  detail.innerHTML=`
+    <div><div class="cap">selected</div><div class="val">${escapeHtml(item.name)}</div></div>
+    <div><div class="cap">start</div><div class="val">${item.start}%</div></div>
+    <div><div class="cap">duration</div><div class="val">${item.duration}%</div></div>
+    <div><div class="cap">impact</div><div class="val">${item.impact}%</div></div>
+    <div><div class="cap">relationship</div>
+      <div class="description">${escapeHtml(item.type)} · ${item.start}% → ${end}% temporal span · upper field magnitude ${item.impact}%${item.url?` · <a href="${safeUrl(item.url)}" target="_blank" rel="noopener" style="color:inherit">open reference ↗</a>`:""}</div>
+    </div>`;
+}
+
+function applyFocus(){
+  document.querySelectorAll("[data-index]").forEach(el=>{
+    el.classList.toggle("dim",Number(el.dataset.index)!==selected);
+    el.classList.toggle("focus",Number(el.dataset.index)===selected);
+  });
+}
+  applyRadialFocus();
+function select(i){
+  selected=(selected===i)?null:i;
+  renderImpactField();renderTimeline();renderDetail();
+}
+function renderChips(){
+  const box=document.getElementById("chips");
+  box.innerHTML="";
+  items.forEach((item,i)=>{
+    const chip=document.createElement("div");
+    chip.className="chip";
+    chip.innerHTML=`<span class="mark"></span><span>${escapeHtml(item.name)}</span><button title="remove">×</button>`;
+    chip.querySelector("button").onclick=()=>{
+      items.splice(i,1);if(selected===i)selected=null;else if(selected>i)selected--;
+      save();render();
+    };
+    chip.addEventListener("click",e=>{if(e.target.tagName!=="BUTTON")select(i)});
+    box.appendChild(chip);
+  });
+  document.getElementById("count").textContent=items.length+" live items";
+}
+function render(){renderImpactField();renderTimeline();renderDetail();renderChips();save()}
+
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function safeUrl(u){
+  try{const url=new URL(u);return /^https?:$/.test(url.protocol)?url.href:"#"}catch{return "#"}
+}
+function showTip(e,item){
+  tooltip.innerHTML=`<strong>${escapeHtml(item.name)}</strong><br>${item.type} · start ${item.start}% · duration ${item.duration}% · impact ${item.impact}%`;
+  tooltip.style.display="block";moveTip(e);
+}
+function moveTip(e){tooltip.style.left=(e.clientX+14)+"px";tooltip.style.top=(e.clientY+14)+"px"}
+function hideTip(){tooltip.style.display="none"}
+
+document.getElementById("form").addEventListener("submit",e=>{
+  e.preventDefault();
+  const name=document.getElementById("name").value.trim()||"untitled";
+  items.push({
+    name,
+    url:document.getElementById("url").value.trim(),
+    start:clamp(+document.getElementById("start").value||50,0,100),
+    duration:clamp(+document.getElementById("duration").value||35,5,100),
+    impact:clamp(+document.getElementById("impact").value||45,10,100),
+    type:document.getElementById("type").value
+  });
+  selected=items.length-1;
+  e.target.reset();
+  document.getElementById("start").value=50;
+  document.getElementById("duration").value=35;
+  document.getElementById("impact").value=45;
+  render();
+});
+
+document.getElementById("theme").onclick=()=>{
+  const light=document.body.dataset.theme==="light";
+  document.body.dataset.theme=light?"dark":"light";
+  document.getElementById("theme").textContent=light?"light mode":"dark mode";
+  render();
+};
+document.getElementById("reset").onclick=()=>{
+  items=initial.map(x=>({...x}));selected=null;render();
+};
+
+window.addEventListener("resize",renderImpactField);
+render();
+</script>
+</body>
+</html>
