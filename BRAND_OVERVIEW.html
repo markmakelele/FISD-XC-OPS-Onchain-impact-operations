@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#08090C">
+<title>FISD XC — Brand Overview</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="assets/brand-tokens.css">
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--fg)}
+body{font:14px/1.6 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:980px;margin:auto;padding:clamp(22px,5vw,72px)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:42px}
+.eyebrow{font:700 10px ui-monospace,monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+button{background:transparent;border:1px solid var(--line2);color:var(--fg);padding:9px 12px;cursor:pointer;font:inherit;font-size:11px}
+.logo{width:min(430px,90%);height:auto;display:block;margin:0 auto 58px}
+h1{font-size:clamp(30px,6vw,58px);line-height:1.02;letter-spacing:-.055em;margin:10px 0 20px}
+.lead{max-width:680px;color:var(--muted);font-size:16px;line-height:1.8;margin:0 0 36px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.swatch{border:1px solid var(--line);background:var(--panel);padding:13px;min-width:0}
+.color{height:90px;margin-bottom:12px;border:1px solid var(--line)}
+.name{font-size:11px;font-weight:700}.hex{font:10px ui-monospace,monospace;color:var(--muted);margin-top:3px}
+.rule{border-top:1px solid var(--line);padding-top:22px;margin-top:38px;color:var(--muted);font-size:12px;max-width:720px}
+@media(max-width:520px){.grid{grid-template-columns:1fr}.logo{margin-bottom:38px}}
+</style>
+</head>
+<body data-theme="dark">
+<div class="wrap">
+<div class="top"><div class="eyebrow">FISD XC / BRAND ID</div><button id="themeBtn">Light mode</button></div>
+<img class="logo" id="brandLogo" src="assets/fisd-xc-dark.svg" alt="FISD XC stacked wordmark">
+<div class="eyebrow">Onchain impact operations</div>
+<h1>Quiet precision.<br>Visible relationships.<br>Verifiable evidence.</h1>
+<p class="lead">The identity stays constant while contrast adapts to context. The brand accent identifies FISD XC; semantic state colours describe operational conditions, never a transaction's trustworthiness by themselves.</p>
+<div class="grid">
+<div class="swatch"><div class="color" style="background:#08090C"></div><div class="name">Night</div><div class="hex">#08090C · dark canvas</div></div>
+<div class="swatch"><div class="color" style="background:#F8F8F5"></div><div class="name">Paper</div><div class="hex">#F8F8F5 · light canvas</div></div>
+<div class="swatch"><div class="color" style="background:#BDCBD4"></div><div class="name">Brand slate</div><div class="hex">#BDCBD4 · dark-mode mark</div></div>
+<div class="swatch"><div class="color" style="background:#000000"></div><div class="name">Ink</div><div class="hex">#000000 · light-mode mark</div></div>
+</div>
+<div class="rule">Observed evidence, computed heuristic, recommendation and manual annotation must remain distinguishable. Blockscout is the onchain data provider; FISD XC is the operational interpretation layer.</div>
+</div>
+<script>
+const button=document.getElementById('themeBtn');
+const logo=document.getElementById('brandLogo');
+function setTheme(theme){document.body.dataset.theme=theme;const light=theme==='light';logo.src=light?'assets/fisd-xc-light.svg':'assets/fisd-xc-dark.svg';button.textContent=light?'Dark mode':'Light mode';document.querySelector('meta[name=theme-color]').content=light?'#F8F8F5':'#08090C';try{localStorage.setItem('fisdTheme',theme)}catch{}}
+try{const saved=localStorage.getItem('fisdTheme');if(saved==='light'||saved==='dark')document.body.dataset.theme=saved}catch{}
+setTheme(document.body.dataset.theme||'dark');
+button.addEventListener('click',()=>setTheme(document.body.dataset.theme==='light'?'dark':'light'));
+</script>
+</body>
+</html>
