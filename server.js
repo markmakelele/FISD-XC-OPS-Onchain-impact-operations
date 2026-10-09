@@ -91,7 +91,7 @@ function serveStatic(req, res, pathname) {
   let decoded;
   try { decoded = decodeURIComponent(pathname); } catch { return jsonError(res, 400, 'Invalid URL path.'); }
   if (decoded === '/') decoded = '/index.html';
-  const allowedStatic = new Set(['/index.html','/assets/brand-tokens.css','/assets/fisd-xc-dark.svg','/assets/fisd-xc-light.svg','/assets/fisd-xc-compact.svg','/assets/fisd-xc-compact-dark.svg','/assets/fisd-xc-compact-light.svg','/assets/favicon.svg']);
+  const allowedStatic = new Set(['/index.html','/BRAND_OVERVIEW.html','/FISD_XC_Blockscout_MVP.html','/fisd-xc-dashboard.html','/FISD_XC_Operational_Live_Source_Dashboard.html','/impact-schedule-sequential.html','/assets/brand-tokens.css','/assets/fisd-xc-dark.svg','/assets/fisd-xc-light.svg','/assets/fisd-xc-compact.svg','/assets/fisd-xc-compact-dark.svg','/assets/fisd-xc-compact-light.svg','/assets/favicon.svg']);
   if (!allowedStatic.has(decoded)) return jsonError(res, 404, 'Not found.');
   const full = path.resolve(ROOT, '.' + decoded);
   if (!full.startsWith(ROOT + path.sep)) return jsonError(res, 403, 'Forbidden.');
