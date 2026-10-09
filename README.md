@@ -1,56 +1,48 @@
-# FISD XC — Onchain Impact Operations
+![FISD XC](assets/fisd-xc-light.svg)
 
-FISD XC turns onchain activity into an explainable triage signal and a next best action. Blockscout provides the evidence; FISD XC adds sequencing, an explainable signal score, rules-based recommendations, local operator notes, and a verifiable path back to Explorer records.
+# FISD XC / OPS
+**Onchain impact operations.** An evidence-first triage layer that turns Blockscout-indexed wallet and contract activity into an explainable timeline, a recommended next inspection action, and a verifiable route back to the source transaction.
 
-## Quick start
+> **Product principle:** Blockscout is the evidence layer. FISD XC is the decision layer.
 
+## Brand identity
+FISD XC uses one consistent identity in two high-contrast expressions: slate-blue `#BDCBD4` on near-black `#08090C`, and black `#000000` on warm white `#F8F8F5`. Brand colour identifies the product; green, amber and red are reserved for operational states. See [Brand ID guidelines](BRAND_GUIDELINES.md) and [shared CSS tokens](assets/brand-tokens.css).
+
+## Run locally
 Requirements: Node.js 18 or newer.
 
-1. Clone this repository.
-2. Copy `.env.example` to `.env`.
-3. Put your Blockscout Pro key in `BLOCKSCOUT_PRO_API_KEY`.
-4. Run `npm start`.
-5. Open http://127.0.0.1:4173.
+1. Copy `.env.example` to `.env`.
+2. Create a Blockscout Pro API key at <https://dev.blockscout.com/> and set `BLOCKSCOUT_PRO_API_KEY` in `.env`.
+3. Run `npm start`.
+4. Open <http://127.0.0.1:4173>.
+5. Enter a public EVM wallet or contract address, choose a chain, and select **Connect live**.
 
-The dashboard works in **simulation mode** without a key. Simulation records are labelled and are not real transactions. Live mode connects through the local Node server, keeping the API key off the client.
+Demo mode works without a key. Simulated records are labelled as simulation. The local server keeps the key off the client. Never commit `.env` or embed a production key in HTML.
 
-## Main files
+## Core files
+- `index.html` — primary responsive dashboard.
+- `server.js` — local Blockscout Pro API proxy with chain/address validation and request throttling.
+- `assets/fisd-xc-dark.svg` — slate logo for dark surfaces.
+- `assets/fisd-xc-light.svg` — black logo for light surfaces.
+- `assets/fisd-xc-compact-dark.svg` and `assets/fisd-xc-compact-light.svg` — compact high-contrast variants.
+- `assets/brand-tokens.css` — shared semantic palette.
+- `BRAND_GUIDELINES.md` — logo, palette, typography, contrast and voice rules.
+- `SUBMISSION_BRIEF.md` and `DEMO_SCRIPT.md` — submission narrative and run-through.
+- `FISD_XC_Operational_Live_Source_Dashboard.html` and `impact-schedule-sequential.html` — earlier visual studies, updated to the same brand system.
 
-- `index.html` — primary FISD XC dashboard with Blockscout connection UI, impact/timeline visualization, transaction evidence, recommendation panel, model trace and local operator notes.
-- `server.js` — local API proxy for address metadata, transaction history, and best-effort token-transfer evidence.
-- `FISD_XC_Blockscout_MVP.html` — standalone UI reference. It calls `/api/monitor` for live data and therefore still needs the server for API-backed operation.
-- `impact-schedule-sequential.html` — separate visual prototype preserving the earlier impact schedule concept.
-- `SUBMISSION_BRIEF.md` and `DEMO_SCRIPT.md` — submission positioning and demonstration walkthrough.
+## Live integration
+The server uses Blockscout Pro REST v2 for address information, transaction history, and best-effort token-transfer evidence. Supported chain IDs in this MVP are Ethereum (1), Optimism (10), Gnosis (100), Polygon (137), Arbitrum One (42161), and Base (8453), subject to API key permissions and plan access.
 
-## Supported chain IDs
-
-The current server allows Ethereum (1), Optimism (10), Gnosis (100), Polygon (137), Arbitrum One (42161), and Base (8453). API permissions and chain access depend on the Blockscout Pro plan/key.
-
-## API routes
-
-- `GET /api/health` — reports provider and key configuration status without returning the secret.
-- `GET /api/monitor?chainId=1&address=0x...` — validates address/chain, requests account metadata and transactions, and attempts to load token transfers.
-
-The server-side API key is sent to Blockscout as `apikey`; it is never intentionally written into the browser UI. The server throttles repeated requests from the same IP and applies a request timeout.
-
-## FISD signal model
-
-The score is a transparent 0–100 triage heuristic based on recency, native-value magnitude relative to the observed sample, interaction type, and transaction outcome. It is not a monetary valuation, fraud verdict, or inference of intent. Recommendations are rules-based and intended to help an operator choose what to inspect next.
+## Operating model
+**Observe → Score → Relate → Act → Verify.** The 0–100 score is an explainable triage heuristic based on recency, sampled native-value magnitude, interaction type, direction and observed outcome. It is not a financial valuation, fraud verdict or inference of intent. Every live recommendation should be checked against the source transaction in Blockscout Explorer.
 
 ## Demo path
+1. Open the dashboard in clearly labelled simulation mode.
+2. Use **Trace model** to explain how observation becomes an action.
+3. Configure a server-side key and connect an address on an allowed chain.
+4. Select a returned transaction and open its Explorer record.
+5. Explain the visible score inputs and recommendation.
+6. Add a manual note and show how it is distinguished from observed onchain evidence.
 
-1. Open the dashboard in simulation mode.
-2. Inspect the impact/timeline visualization and a transaction recommendation.
-3. Open **Trace model** to explain Observe → Score → Relate → Act → Verify.
-4. Configure the server key and connect a public wallet/contract on an allowed chain.
-5. Select a live transaction and verify its Explorer record.
-6. Add a local note to demonstrate human-in-the-loop operations.
-
-## Security and limitations
-
-- Do not commit `.env` or embed a Pro API key in HTML.
-- Live API access has not been verified in this repository because a real key was not supplied for testing.
-- The client currently samples the first 50 transaction records; pagination and historical comparisons are future work.
-- Token transfers are supporting evidence, not yet a separately modelled token-flow graph.
-- Polling is interval-based; this is not a push-streaming system.
-- The current server is a local MVP proxy. Public production deployment needs authentication, tenant isolation, persistent storage, observability, stronger rate limiting, automated tests and deployment-specific network configuration.
+## Limitations
+The current live client samples up to 50 records and uses interval polling rather than push streaming. Token transfers are supporting evidence, not yet a dedicated token-flow graph. The score is an initial heuristic and requires validation with real operator tasks. Public production deployment needs authentication, tenant isolation, persistence, observability, automated tests and deployment-specific rate limiting.
