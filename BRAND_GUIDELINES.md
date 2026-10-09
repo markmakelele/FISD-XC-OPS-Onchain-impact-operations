@@ -1,55 +1,55 @@
 ![FISD XC](assets/fisd-xc-light.svg)
 
-# FISD XC — Brand ID guidelines
+# FISD XC — Shared Brand ID
 
-## Brand idea
-**Quiet precision. Visible relationships. Verifiable evidence.** The mark is the identity; the dashboard is the instrument. Keep the visual language restrained so onchain evidence, state changes and recommendations remain the focus.
+## Brand principle
 
-## Primary mark
-The supplied stacked composition—lowercase `fisd` above geometric `XC`, with its baseline segments—is the primary identity. Use the provided SVG assets rather than recreating the mark with a substitute typeface.
+**Quiet precision. Visible relationships. Verifiable evidence.** The brand mark identifies the product; interface colour explains the operating context; semantic state colours communicate connection, warning and error. Never make the brand colour itself a safety or risk verdict.
 
-## Approved expressions
+## Approved marks
 
-| Context | Mark | Background |
+| Context | Mark | Canvas |
 |---|---|---|
-| Dark mode | Slate `#BDCBD4` | Near-black `#08090C` |
-| Light mode | Ink `#000000` | Warm white `#F8F8F5` |
-| Compact dark | `fisd-xc-compact-dark.svg` | Dark high-contrast surface |
-| Compact light | `fisd-xc-compact-light.svg` | Light high-contrast surface |
+| Dark mode | Slate `#BDCBD4` | Night `#08090C` |
+| Light mode | Ink `#000000` | Paper `#F8F8F5` |
+| Compact UI | Compact mark in `assets/` | Use the variant matching the canvas |
 
-Never place the slate mark on white; contrast is too low. Never place the black mark on a near-black surface.
+Use the supplied transparent SVGs. Do not rebuild the mark with a substitute font, distort its proportions, recolour it arbitrarily, or place the slate expression on white. The stacked lockup is for overview and brand pages; compact assets are for constrained headers.
 
-## Palette
-- **Brand slate:** `#BDCBD4` — identity accent on dark surfaces.
-- **Ink:** `#000000` — primary identity in light mode.
-- **Night:** `#08090C` — dark canvas.
-- **Paper:** `#F8F8F5` — light canvas.
-- **Surface:** `#0E1015` dark / `#FFFFFF` light.
-- **Muted copy:** `#A3A9B4` dark / `#5E5E58` light.
-- **Rules:** `#292E38` dark / `#C9C9C3` light.
-- **Semantic state:** green, amber and red communicate operational state only. Brand accent does not indicate that a transaction is safe or dangerous.
+## Shared colour tokens
 
-The shared tokens live in [assets/brand-tokens.css](assets/brand-tokens.css).
+- Brand slate: `#BDCBD4`
+- Ink: `#000000`
+- Night: `#08090C`
+- Paper: `#F8F8F5`
+- Dark surface: `#0E1015`
+- Light surface: `#FFFFFF`
+- Dark primary text: `#F3F4F5`
+- Light primary text: `#11110F`
+- Dark muted text: `#A3A9B4`
+- Light muted text: `#5E5E58`
 
-## Typography and layout
-Use a neutral, highly legible sans-serif for prose and a monospace face for addresses, hashes, labels and numeric evidence. Prefer clear hierarchy over letter-spaced body text. Keep card corners restrained (about 4–6 px), dividers thin, and negative space intact. The impact field may be expressive; transaction tables should remain quiet and scannable.
+The shared CSS contract is `assets/brand-tokens.css`; avoid duplicating theme palettes inside individual files. Interface-only tokens can extend the shared contract, but the brand colours above remain canonical.
 
-## Mark usage
-- Preserve proportions and letter relationships.
-- Do not rotate, distort, outline, italicize or arbitrarily recolour the mark.
-- Keep the complete stacked mark for overviews, write-ups and brand covers.
-- Use a compact variant only when space genuinely constrains the full lockup.
-- Keep clear space around the mark roughly equal to the height of the lowercase `i` stem.
-- At very small sizes, use the compact variant instead of shrinking the complete composition until details disappear.
+## Typography and interface
 
-## Dark/light behavior
-The application changes canvas, surfaces, type, dividers, semantic states and mark in one theme action. Respect the selected theme between reloads. The brand remains stable; the context changes.
+Use a legible system sans-serif for prose and a monospace face for addresses, hashes, endpoint names and numeric evidence. Body copy should be normally tracked; wide letter spacing is reserved for short labels. Use restrained 4–6 px corners, thin rules and ample negative space. Keep data tables quiet and scannable.
+
+## Two operating states
+
+- **Simple:** essential metrics, impact field, recent activity and next best action.
+- **Full workings / Complex:** transaction table, data provenance, API status, score-component breakdown, model methodology and local operator annotations.
+
+These are display states, not separate data-integrity levels. Both must label simulation and live data truthfully.
 
 ## Accessibility
-Target WCAG AA contrast for body text (4.5:1) and at least 3:1 for qualifying large text and essential UI graphics. Provide visible keyboard focus. Do not communicate connection or risk state by colour alone; pair colour with text or another visual indicator. Verify the rendered interface rather than relying only on token values.
+
+Target WCAG AA: 4.5:1 contrast for normal text; 3:1 for qualifying large text and essential graphical components. Keep visible keyboard focus, semantic button labels and touch-equivalent inspection. State must never be represented by colour alone. Test the actual rendered page in both themes.
 
 ## Voice and evidence
-Distinguish observed facts, computed heuristics, recommendations and manual annotations. Avoid claims that the heuristic proves fraud, intent, causality or monetary impact.
+
+Separate observed onchain facts, computed heuristic scores, rules-based recommendations and operator-authored notes. The signal is not a fraud detector, monetary impact estimate, or proof of intent or causality. Link live recommendations back to Blockscout Explorer evidence.
 
 ## Attribution
-FISD XC is the product identity. Blockscout is the onchain data provider and Explorer verification destination. Do not imply official endorsement or ownership by Blockscout.
+
+FISD XC is the product identity. Blockscout is the data provider and Explorer verification destination. Do not imply official endorsement by Blockscout.
