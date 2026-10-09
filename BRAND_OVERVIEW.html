@@ -1,52 +1,21 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-host-mode="fullstack">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#08090C">
-<title>FISD XC — Brand Overview</title>
-<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-<link rel="stylesheet" href="assets/brand-tokens.css">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#08090C">
+<link rel="icon" href="assets/favicon.svg"><link rel="stylesheet" href="assets/brand-tokens.css">
+<title>FISD XC — Brand ID & Operating States</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--fg)}
-body{font:14px/1.6 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
-.wrap{max-width:980px;margin:auto;padding:clamp(22px,5vw,72px)}
-.top{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:42px}
-.eyebrow{font:700 10px ui-monospace,monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
-button{background:transparent;border:1px solid var(--line2);color:var(--fg);padding:9px 12px;cursor:pointer;font:inherit;font-size:11px}
-.logo{width:min(430px,90%);height:auto;display:block;margin:0 auto 58px}
-h1{font-size:clamp(30px,6vw,58px);line-height:1.02;letter-spacing:-.055em;margin:10px 0 20px}
-.lead{max-width:680px;color:var(--muted);font-size:16px;line-height:1.8;margin:0 0 36px}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.swatch{border:1px solid var(--line);background:var(--panel);padding:13px;min-width:0}
-.color{height:90px;margin-bottom:12px;border:1px solid var(--line)}
-.name{font-size:11px;font-weight:700}.hex{font:10px ui-monospace,monospace;color:var(--muted);margin-top:3px}
-.rule{border-top:1px solid var(--line);padding-top:22px;margin-top:38px;color:var(--muted);font-size:12px;max-width:720px}
-@media(max-width:520px){.grid{grid-template-columns:1fr}.logo{margin-bottom:38px}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.6 Inter,system-ui,sans-serif}.wrap{max-width:1160px;margin:auto;padding:clamp(20px,4vw,54px)}.top{display:flex;align-items:center;justify-content:space-between;gap:14px;padding-bottom:16px;border-bottom:1px solid var(--line)}.id{display:flex;gap:11px;align-items:center}.mark{width:50px;color:var(--fisd-logo-color);height:auto}.eyebrow{font:700 10px ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}.btn{border:1px solid var(--line2);border-radius:5px;background:transparent;color:var(--fg);padding:8px 11px;cursor:pointer}.hero{padding:clamp(28px,6vw,68px) 0 34px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(270px,.9fr);gap:30px;align-items:center}.hero h1{font-size:clamp(32px,6vw,66px);letter-spacing:-.055em;line-height:.98;margin:10px 0 18px}.hero p{max-width:670px;color:var(--muted);font-size:16px}.logo-large{width:min(100%,440px);display:block;color:var(--fisd-logo-color);margin:auto}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:18px 0}.card{border:1px solid var(--line);border-radius:6px;padding:18px;background:var(--panel);min-width:0}.card h2{margin:7px 0 10px;font-size:17px}.card p,.card li{color:var(--muted);font-size:12px}.swatch{height:52px;border:1px solid var(--line);margin-bottom:10px}.row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.token{font-size:11px;overflow-wrap:anywhere}.token strong{display:block;margin-bottom:3px}.state-id{font:700 10px ui-monospace,monospace;letter-spacing:.12em;color:var(--accent)}.flow{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:14px 0}.flow span{border:1px solid var(--line2);padding:7px 9px;border-radius:4px;font:10px ui-monospace,monospace}.flow b{color:var(--muted)}a{color:var(--accent)}footer{border-top:1px solid var(--line);padding-top:16px;display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:11px}@media(max-width:720px){.hero{grid-template-columns:1fr}.logo-large{width:min(76%,330px)}.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr 1fr}footer{flex-direction:column}}
 </style>
 </head>
-<body data-theme="dark">
-<div class="wrap">
-<div class="top"><div class="eyebrow">FISD XC / BRAND ID</div><button id="themeBtn">Light mode</button></div>
-<img class="logo" id="brandLogo" src="assets/fisd-xc-dark.svg" alt="FISD XC stacked wordmark">
-<div class="eyebrow">Onchain impact operations</div>
-<h1>Quiet precision.<br>Visible relationships.<br>Verifiable evidence.</h1>
-<p class="lead">The identity stays constant while contrast adapts to context. The brand accent identifies FISD XC; semantic state colours describe operational conditions, never a transaction's trustworthiness by themselves.</p>
-<div class="grid">
-<div class="swatch"><div class="color" style="background:#08090C"></div><div class="name">Night</div><div class="hex">#08090C · dark canvas</div></div>
-<div class="swatch"><div class="color" style="background:#F8F8F5"></div><div class="name">Paper</div><div class="hex">#F8F8F5 · light canvas</div></div>
-<div class="swatch"><div class="color" style="background:#BDCBD4"></div><div class="name">Brand slate</div><div class="hex">#BDCBD4 · dark-mode mark</div></div>
-<div class="swatch"><div class="color" style="background:#000000"></div><div class="name">Ink</div><div class="hex">#000000 · light-mode mark</div></div>
+<body data-theme="dark"><div class="wrap">
+<header class="top"><div class="id"><img class="mark logo-dark" src="assets/fisd-xc-compact-dark.svg" alt=""><img class="mark logo-light" src="assets/fisd-xc-compact-light.svg" alt="" style="display:none"><div><div class="eyebrow">Brand ID / FISD XC</div><strong>Onchain impact operations</strong></div></div><div style="display:flex;gap:8px"><a class="btn" href="index.html" style="text-decoration:none">Open dashboard →</a><button class="btn" id="theme">Light mode</button></div></header>
+<section class="hero"><div><div class="eyebrow">Quiet precision · visible relationships · verifiable evidence</div><h1>One identity.<br>Two operating states.</h1><p>The brand remains constant. The application can stay simple for an operator who needs the next action, or reveal the complete chain of evidence and scoring for someone who needs to inspect the workings.</p></div><svg class="logo-large" viewBox="0 0 655 464" role="img" aria-label="FISD XC stacked logo"><image class="logo-image" href="assets/fisd-xc-dark.svg" width="655" height="464"/></svg></section>
+<div class="eyebrow">01 / Identity colour</div><div class="grid"><section class="card"><div class="swatch" style="background:#08090C"></div><div class="token"><strong>Dark expression</strong>Slate mark <code>#BDCBD4</code> on Night <code>#08090C</code></div></section><section class="card"><div class="swatch" style="background:#F8F8F5"></div><div class="token"><strong>Light expression</strong>Ink mark <code>#000000</code> on Paper <code>#F8F8F5</code></div></section></div>
+<div class="eyebrow">02 / Application states</div><div class="grid"><section class="card"><div class="state-id">SIMPLE</div><h2>Decision-first</h2><p>For a quick read. Keeps the key metrics, impact field, recent evidence, and next best action. Hides detailed API diagnostics, component math, and the manual operations overlay.</p><div class="flow"><span>Observe</span><b>→</b><span>Next action</span><b>→</b><span>Verify</span></div></section><section class="card"><div class="state-id">FULL WORKINGS / COMPLEX</div><h2>Inspection and audit</h2><p>For analysts and builders. Reveals score contributions, transaction evidence, provider status, API provenance, methodology and local notes.</p><div class="flow"><span>Observe</span><b>→</b><span>Normalize</span><b>→</b><span>Score</span><b>→</b><span>Relate</span><b>→</b><span>Act</span><b>→</b><span>Verify</span></div></section></div>
+<div class="eyebrow">03 / Hosting profiles</div><div class="grid"><section class="card"><div class="state-id">STATIC PREVIEW</div><h2>Simple hosting</h2><p>GitHub Pages serves the branded <code>docs/</code> build. It is demo/simulation only; the live connection is disabled and no API key is needed.</p><ol><li>Deploy from branch <code>main</code>.</li><li>Select <code>/docs</code> as the publishing folder.</li><li>Open the page and toggle Simple / Full workings to inspect the model with simulated records.</li></ol></section><section class="card"><div class="state-id">WEB SERVICE + API</div><h2>Full-stack hosting</h2><p>Render runs the Node.js app and Blockscout API proxy in one service. The API key is held in environment secrets, never in client HTML.</p><ol><li>Deploy the root using <code>render.yaml</code>.</li><li>Set <code>BLOCKSCOUT_PRO_API_KEY</code>.</li><li>Use <code>/api/health</code> and connect a supported address.</li></ol></section></div>
+<div class="eyebrow">04 / Shared palette</div><div class="row"><div class="card"><div class="swatch" style="background:#BDCBD4"></div><div class="token"><strong>Brand slate</strong>#BDCBD4</div></div><div class="card"><div class="swatch" style="background:#000"></div><div class="token"><strong>Ink</strong>#000000</div></div><div class="card"><div class="swatch" style="background:#0E1015"></div><div class="token"><strong>Dark surface</strong>#0E1015</div></div><div class="card"><div class="swatch" style="background:#FFFFFF"></div><div class="token"><strong>Light surface</strong>#FFFFFF</div></div></div>
+<footer><span>FISD XC / OPS · Brand identity and delivery states</span><span>Blockscout is the evidence layer; FISD XC is the decision layer.</span></footer>
 </div>
-<div class="rule">Observed evidence, computed heuristic, recommendation and manual annotation must remain distinguishable. Blockscout is the onchain data provider; FISD XC is the operational interpretation layer.</div>
-</div>
-<script>
-const button=document.getElementById('themeBtn');
-const logo=document.getElementById('brandLogo');
-function setTheme(theme){document.body.dataset.theme=theme;const light=theme==='light';logo.src=light?'assets/fisd-xc-light.svg':'assets/fisd-xc-dark.svg';button.textContent=light?'Dark mode':'Light mode';document.querySelector('meta[name=theme-color]').content=light?'#F8F8F5':'#08090C';try{localStorage.setItem('fisdTheme',theme)}catch{}}
-try{const saved=localStorage.getItem('fisdTheme');if(saved==='light'||saved==='dark')document.body.dataset.theme=saved}catch{}
-setTheme(document.body.dataset.theme||'dark');
-button.addEventListener('click',()=>setTheme(document.body.dataset.theme==='light'?'dark':'light'));
-</script>
-</body>
-</html>
+<script>document.getElementById('theme').onclick=()=>{const light=document.body.dataset.theme==='light';document.body.dataset.theme=light?'dark':'light';document.getElementById('theme').textContent=light?'Light mode':'Dark mode';document.querySelector('.logo-image').setAttribute('href',light?'assets/fisd-xc-dark.svg':'assets/fisd-xc-light.svg');document.querySelector('.logo-dark').style.display=light?'inline':'none';document.querySelector('.logo-light').style.display=light?'none':'inline';document.querySelector('meta[name=theme-color]').content=light?'#08090C':'#F8F8F5'}</script>
+</body></html>
