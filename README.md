@@ -30,7 +30,7 @@ Demo mode works without a key. Simulated records are labelled as simulation. The
 - `SUBMISSION_BRIEF.md` and `DEMO_SCRIPT.md` — submission narrative and run-through.
 - `FISD_XC_Operational_Live_Source_Dashboard.html` and `impact-schedule-sequential.html` — earlier visual studies, updated to the same brand system.
 
-## Live integration
+The shared brand overview is available at `/BRAND_OVERVIEW.html`; theme switching previews both approved brand expressions.\n\n## Live integration
 The server uses Blockscout Pro REST v2 for address information, transaction history, and best-effort token-transfer evidence. Supported chain IDs in this MVP are Ethereum (1), Optimism (10), Gnosis (100), Polygon (137), Arbitrum One (42161), and Base (8453), subject to API key permissions and plan access.
 
 ## Operating model
