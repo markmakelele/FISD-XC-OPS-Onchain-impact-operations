@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="en" data-host-mode="fullstack">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#08090c">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<meta name="color-scheme" content="dark light">
+<meta name="description" content="FISD XC turns Blockscout-indexed on-chain activity into explainable signals, recommended investigative moves, and evidence-linked verification.">
+<meta property="og:title" content="FISD XC / OPS — Onchain Impact Operations">
+<meta property="og:description" content="A responsive card-based decision board for on-chain activity.">
+<title>FISD XC / OPS — Onchain Impact Operations</title>
+<style>
+:root{color-scheme:dark;--bg:#08090c;--panel:#0e1015;--panel2:#12151b;--fg:#f3f4f5;--muted:#a3a9b4;--faint:#6e7683;--line:#292e38;--line2:#49515e;--accent:#bdcbd4;--soft:rgba(189,203,212,.07);--green:#82d8b4;--amber:#e4c27a;--red:#f17c85;--shadow:rgba(0,0,0,.34);--radius:8px}
+[data-theme="light"]{color-scheme:light;--bg:#f8f8f5;--panel:#fff;--panel2:#f1f1ec;--fg:#11110f;--muted:#5e5e58;--faint:#797970;--line:#d9d9d2;--line2:#a5a59b;--accent:#000;--soft:rgba(0,0,0,.045);--shadow:rgba(20,25,35,.09)}
+*{box-sizing:border-box}html{scroll-behavior:smooth;background:var(--bg)}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.005em}button,input,select{font:inherit;color:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}a{color:inherit;text-decoration:none}a:hover{text-decoration:underline}button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.shell{width:min(1500px,100%);margin:auto;padding:clamp(14px,2vw,30px) clamp(12px,2.4vw,36px) 36px}.header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-bottom:16px;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:12px;min-width:0}.brand-logo{width:clamp(38px,4vw,54px);height:auto;display:block;color:var(--accent);flex:0 0 auto}.brandname{font-size:14px;font-weight:800;letter-spacing:.08em}.brandname span{color:var(--accent)}.branddesc{font-size:10px;color:var(--muted);margin-top:2px}.header-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.btn{border:1px solid var(--line2);border-radius:5px;background:transparent;padding:9px 12px;font-size:11px;font-weight:650;transition:background .15s,border-color .15s,transform .15s}.btn:hover{background:var(--soft);border-color:var(--fg)}.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:800}.btn.subtle{border-color:var(--line);color:var(--muted)}.pill,.tag{display:inline-flex;align-items:center;gap:7px;padding:6px 9px;border:1px solid var(--line);border-radius:5px;font-size:9px;letter-spacing:.08em;color:var(--muted);white-space:nowrap}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--faint);flex:0 0 auto}.dot.good{background:var(--green)}.dot.warn{background:var(--amber)}.dot.bad{background:var(--red)}.view-switch{display:inline-flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:6px;background:var(--panel)}.view-btn{background:transparent;border:1px solid transparent;border-radius:4px;padding:7px 10px;color:var(--muted);font-size:10px;font-weight:700}.view-btn.active{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.intro{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding:25px 0 16px}.intro-main{max-width:780px}.eyebrow{font:750 9px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}.intro h1{font-size:clamp(26px,3.3vw,45px);line-height:1.02;letter-spacing:-.055em;margin:8px 0 10px;max-width:850px}.intro h1 em{font-style:normal;color:var(--accent)}.intro p{max-width:800px;margin:0;color:var(--muted);font-size:12px;line-height:1.7}.flow-key{display:grid;gap:7px;min-width:205px;color:var(--muted);font-size:9px}.flow-key span{display:flex;align-items:center;gap:8px}.flow-key b{width:22px;height:22px;display:grid;place-items:center;border:1px solid var(--line2);border-radius:4px;color:var(--fg);font:700 9px ui-monospace,monospace}
+.view-note{display:flex;gap:11px;align-items:center;padding:9px 0 12px;border-bottom:1px solid var(--line);font-size:10px;color:var(--muted)}.view-note strong{font:800 9px ui-monospace,monospace;letter-spacing:.12em;color:var(--fg);white-space:nowrap}body[data-view="complex"] .view-note{background:linear-gradient(90deg,var(--soft),transparent);padding-inline:10px}
+.connect{border:1px solid var(--line);background:var(--panel);padding:12px 14px;margin:14px 0 20px;border-radius:var(--radius)}.connect-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.connect-title{font-weight:800;font-size:12px}.connect-note{font-size:10px;color:var(--muted);margin-top:2px}.connection-grid{display:grid;grid-template-columns:160px minmax(220px,1fr) auto auto;gap:7px}.control{width:100%;min-width:0;background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:10px 11px;font-size:11px}.control::placeholder{color:var(--faint)}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.connect-foot{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:9px;color:var(--muted);font-size:10px;line-height:1.55}.error{color:var(--red)}.success{color:var(--green)}.warning{color:var(--amber)}
+/* The four regions form a single vertical decision path; no competing bento columns. */
+.section{margin-top:20px;scroll-margin-top:18px}.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:15px;margin-bottom:10px}.section-title{font-size:clamp(15px,1.7vw,20px);letter-spacing:-.035em;font-weight:800;margin:0}.section-kicker{font:700 9px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.13em;color:var(--muted);margin-bottom:4px}.section-help{font-size:10px;line-height:1.6;color:var(--muted);max-width:570px;margin-top:4px}.surface{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);min-width:0;overflow:hidden}.position-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-bottom:1px solid var(--line)}.metric{min-width:0;padding:13px 15px;border-right:1px solid var(--line)}.metric:last-child{border-right:0}.metric-label{font:750 8px ui-monospace,SFMono-Regular,Menlo,monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}.metric-value{font-size:clamp(18px,2.1vw,26px);font-weight:800;line-height:1.15;letter-spacing:-.045em;margin:7px 0 4px;overflow-wrap:anywhere}.metric-foot{font-size:9px;line-height:1.45;color:var(--muted);overflow-wrap:anywhere}.position-visual-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:13px 15px 0}.panel-title{font-size:11px;font-weight:800}.panel-sub{font-size:9px;line-height:1.5;color:var(--muted);margin-top:3px}.legend{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:9px}.legend span{display:flex;align-items:center;gap:6px}.legend i{width:7px;height:7px;border:1px solid var(--accent);border-radius:50%}.chart-wrap{padding:4px 10px 0;overflow:hidden}.chart{width:100%;height:auto;display:block;overflow:visible}.chart .line{stroke:var(--line2);stroke-width:1;fill:none;vector-effect:non-scaling-stroke}.chart .axis{stroke:var(--line);stroke-width:1;fill:none;vector-effect:non-scaling-stroke}.chart .label{fill:var(--muted);font:10px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.06em}.chart .node{fill:var(--panel);stroke:var(--accent);stroke-width:1.2;cursor:pointer;vector-effect:non-scaling-stroke;transition:stroke-width .15s,filter .15s}.chart .node:hover,.chart .node.selected{stroke:var(--fg);stroke-width:2.3;filter:drop-shadow(0 0 5px var(--accent))}.chart .node-value{fill:var(--fg);font:10px ui-monospace,SFMono-Regular,Menlo,monospace;text-anchor:middle;pointer-events:none}.chart .event-stem{stroke:var(--line2);stroke-width:1;vector-effect:non-scaling-stroke}.chart .event-mark{fill:var(--fg);stroke:var(--accent);stroke-width:1;cursor:pointer}.chart [data-index]{transition:opacity .15s}.chart .dim{opacity:.16}.chart .focus{opacity:1;filter:drop-shadow(0 0 4px var(--accent))}.chart .now{stroke:var(--accent);stroke-width:1;stroke-dasharray:4 5}.chart .bar{fill:var(--accent);opacity:.9;cursor:pointer}.chart .bar:hover{opacity:1}.chart-caption{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding:10px 14px;color:var(--muted);font-size:9px;line-height:1.6}
+.next-move{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(220px,.7fr);gap:0}.next-main{padding:clamp(16px,2.3vw,26px);border-right:1px solid var(--line);background:linear-gradient(120deg,var(--soft),transparent 65%)}.action-head{display:flex;align-items:center;gap:7px;margin-bottom:11px}.action-type{font:800 9px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.13em;color:var(--muted)}.action-title{font-size:clamp(20px,2.5vw,30px);font-weight:820;line-height:1.1;letter-spacing:-.05em;max-width:800px;margin:0 0 10px}.action-copy{max-width:760px;font-size:12px;line-height:1.7;color:var(--muted)}.next-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}.next-meta{display:grid;align-content:start;padding:18px;gap:0}.next-meta-item{padding:11px 0;border-bottom:1px solid var(--line)}.next-meta-item:first-child{padding-top:0}.next-meta-item:last-child{border-bottom:0}.meta-label{font:750 8px ui-monospace,monospace;letter-spacing:.11em;color:var(--muted);text-transform:uppercase;margin-bottom:5px}.meta-value{font-size:11px;font-weight:750;overflow-wrap:anywhere}.score-badge{display:inline-flex;align-items:center;border:1px solid var(--line2);border-radius:5px;padding:6px 8px;font:800 10px ui-monospace,monospace;color:var(--accent);white-space:nowrap}
+.move-board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.move-card{position:relative;display:flex;flex-direction:column;min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:15px;background:var(--panel);transition:border-color .15s,background .15s,transform .15s}.move-card:hover{border-color:var(--line2);transform:translateY(-1px)}.move-card.chosen{border-color:var(--accent);background:linear-gradient(135deg,var(--soft),transparent 70%),var(--panel)}.move-card.recommended:before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:2px;background:var(--accent)}.move-card-top{display:flex;justify-content:space-between;align-items:center;gap:6px}.move-number{font:700 10px ui-monospace,monospace;color:var(--muted)}.move-badge{font:800 7px ui-monospace,monospace;letter-spacing:.1em;color:var(--muted);border:1px solid var(--line);padding:4px 5px;border-radius:3px}.move-card.recommended .move-badge{color:var(--fg);border-color:var(--line2)}.move-card h3{font-size:16px;line-height:1.2;letter-spacing:-.03em;margin:16px 0 8px}.move-card p{font-size:10px;line-height:1.65;color:var(--muted);margin:0 0 16px;flex:1}.move-effect{border-top:1px solid var(--line);padding-top:10px;margin-top:auto}.move-effect span{display:block;font:750 7px ui-monospace,monospace;letter-spacing:.13em;color:var(--muted);margin-bottom:5px}.move-effect b{font-size:10px;line-height:1.55;font-weight:650;display:block}.move-action{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;border:1px solid var(--line2);border-radius:4px;padding:9px 10px;margin-top:13px;background:transparent;font-size:10px;font-weight:750;text-align:left}.move-action.primary{background:var(--accent);border-color:var(--accent);color:var(--bg)}.move-preview{display:flex;gap:14px;align-items:flex-start;padding:11px 14px;border:1px solid var(--line);border-top:0;border-radius:0 0 var(--radius) var(--radius);background:var(--panel2)}.move-preview-tag{font:750 7px ui-monospace,monospace;letter-spacing:.12em;color:var(--muted);white-space:nowrap;padding-top:2px}.move-preview strong{font-size:10px;display:block;margin-bottom:3px}.move-preview span{font-size:9px;line-height:1.6;color:var(--muted)}
+.verify-top{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid var(--line)}.verify-symbol{width:32px;height:32px;border:1px solid var(--line2);display:grid;place-items:center;border-radius:5px;font-size:15px}.verify-state{font:800 8px ui-monospace,monospace;letter-spacing:.1em;color:var(--muted)}.verify-title{font-size:12px;font-weight:800;margin:3px 0}.verify-copy{font-size:10px;line-height:1.6;color:var(--muted)}.verify-tools{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.btn.reviewed{border-color:var(--green);color:var(--green)}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:10px;min-width:680px}th{text-align:left;font:800 8px ui-monospace,monospace;color:var(--muted);letter-spacing:.09em;text-transform:uppercase;background:var(--panel2)}th,td{padding:11px 12px;border-bottom:1px solid var(--line);white-space:nowrap}tbody tr{cursor:pointer}tbody tr:hover,tbody tr.selected{background:var(--soft)}.hash{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--accent)}.direction{font:750 8px ui-monospace,monospace;border:1px solid var(--line);border-radius:4px;padding:3px 5px}.score{font:800 10px ui-monospace,monospace}.status{font:750 8px ui-monospace,monospace}.empty-row{text-align:center;color:var(--muted);padding:28px}.detail{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:12px;align-items:center;padding:14px;border-top:1px solid var(--line);background:var(--panel2)}.detail-label{font:800 8px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:5px}.detail-value{font-size:10px;overflow-wrap:anywhere}.detail-note{grid-column:1/-1;color:var(--muted);font-size:10px;line-height:1.6}
+.advanced-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:9px}.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:13px 15px;border-bottom:1px solid var(--line)}.panel-title{font-size:11px;font-weight:800}.panel-sub{font-size:9px;line-height:1.5;color:var(--muted);margin-top:3px}.panel-body{padding:13px 15px}.score-parts{display:grid;gap:10px}.score-part{display:grid;grid-template-columns:minmax(100px,1fr) auto;gap:6px 10px;align-items:center}.score-part-name{font-size:10px}.score-part-value{font:800 9px ui-monospace,monospace;color:var(--fg);white-space:nowrap}.score-track{height:5px;background:var(--panel2);border-radius:4px;overflow:hidden;grid-column:1/-1}.score-fill{height:100%;background:var(--accent);border-radius:4px}.breakdown-foot{color:var(--muted);font-size:9px;line-height:1.6;margin-top:11px;border-top:1px solid var(--line);padding-top:9px}.rule-list{display:grid;gap:11px}.rule{display:grid;grid-template-columns:25px minmax(0,1fr);gap:9px}.rule-n{width:24px;height:24px;border:1px solid var(--line2);border-radius:4px;display:grid;place-items:center;font:9px ui-monospace,monospace;color:var(--accent)}.rule b{display:block;font-size:10px;margin-bottom:2px}.rule p{margin:0;color:var(--muted);font-size:9px;line-height:1.6}.api-status{display:grid;gap:8px}.api-row{display:flex;justify-content:space-between;gap:10px;font-size:10px;padding-bottom:8px;border-bottom:1px solid var(--line)}.api-row:last-of-type{border:0;padding:0}.api-row span{color:var(--muted)}.manual{margin-top:10px;padding:14px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel)}.manual-form{display:grid;grid-template-columns:minmax(180px,1.4fr) 140px 110px auto;gap:8px;margin-top:10px}.manual-help{font-size:10px;color:var(--muted);line-height:1.6;margin-top:7px}.footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:18px 0 0;color:var(--muted);font-size:9px}.toast{position:fixed;right:18px;bottom:18px;z-index:99;max-width:min(430px,calc(100vw - 36px));padding:12px 14px;background:var(--fg);color:var(--bg);border-radius:6px;box-shadow:0 12px 40px var(--shadow);font-size:11px;display:none}.toast.show{display:block}.modal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.66);display:none;place-items:center;padding:18px}.modal.open{display:grid}.modal-card{width:min(610px,100%);max-height:min(84vh,740px);overflow:auto;padding:20px;border:1px solid var(--line2);border-radius:8px;background:var(--panel);box-shadow:0 20px 80px var(--shadow)}.modal-card h2{font-size:17px;letter-spacing:-.03em;margin:0 0 9px}.modal-card p,.modal-card li{font-size:11px;color:var(--muted);line-height:1.75}.modal-card ol{padding-left:20px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+body[data-view="simple"] .advanced-only{display:none!important}body[data-view="simple"] .position-summary{grid-template-columns:repeat(3,minmax(0,1fr))}body[data-view="simple"] #verifyOutcome table th:nth-child(1),body[data-view="simple"] #verifyOutcome table td:nth-child(1),body[data-view="simple"] #verifyOutcome table th:nth-child(5),body[data-view="simple"] #verifyOutcome table td:nth-child(5),body[data-view="simple"] #verifyOutcome table th:nth-child(6),body[data-view="simple"] #verifyOutcome table td:nth-child(6){display:none}body[data-view="simple"] #verifyOutcome table{min-width:480px}
+@media(max-width:920px){.intro{align-items:flex-start;flex-direction:column}.flow-key{grid-template-columns:repeat(2,minmax(0,1fr));width:100%}.connection-grid{grid-template-columns:150px minmax(0,1fr) auto auto}.next-move{grid-template-columns:1fr}.next-main{border-right:0;border-bottom:1px solid var(--line)}.next-meta{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.next-meta-item{border-bottom:0;border-right:1px solid var(--line);padding:0 10px 0 0}.next-meta-item:last-child{border-right:0}.position-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.metric:nth-child(2){border-right:0}.metric:nth-child(-n+2){border-bottom:1px solid var(--line)}.move-board{grid-template-columns:repeat(3,minmax(0,1fr))}.advanced-grid{grid-template-columns:1fr}.detail{grid-template-columns:repeat(3,minmax(0,1fr))}.detail button{grid-column:1/-1;justify-self:start}}
+@media(max-width:680px){.shell{padding:12px 12px 25px}.header{align-items:flex-start;flex-wrap:wrap;gap:12px}.brandname{font-size:12px}.branddesc{font-size:9px}.header-actions{width:100%;justify-content:flex-start}.pill{display:none}.intro{padding:20px 0 13px}.intro h1{font-size:30px}.flow-key{gap:6px}.connect{padding:11px;margin-top:12px}.connect-head{align-items:flex-start;flex-direction:column}.connection-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.connection-grid #chain,.connection-grid #address{grid-column:1/-1}.connection-grid .btn{width:100%}.connect-foot{flex-direction:column;align-items:flex-start}.view-note{align-items:flex-start;flex-direction:column;gap:5px}.section{margin-top:18px}.section-head{align-items:flex-start;flex-direction:column}.position-visual-head{padding:12px 12px 0}.chart-wrap{overflow-x:auto}.chart{min-width:680px}.chart-caption{font-size:8px}.move-board{grid-template-columns:1fr}.move-card{padding:13px}.move-card h3{margin:10px 0 6px}.move-card p{margin-bottom:10px}.move-effect{padding-top:8px}.next-main{padding:15px}.action-title{font-size:22px}.next-meta{grid-template-columns:1fr 1fr;padding:13px}.next-meta-item{border-right:0;padding:8px 0;border-bottom:1px solid var(--line)}.next-meta-item:nth-child(2){border-bottom:1px solid var(--line)}.next-meta-item:last-child{grid-column:1/-1;border-bottom:0}.verify-top{grid-template-columns:32px minmax(0,1fr);padding:12px;align-items:start}.verify-tools{grid-column:1/-1;padding-left:44px}.verify-copy{font-size:9px}.table-wrap{overflow-x:auto}.detail{grid-template-columns:1fr 1fr;gap:10px;padding:12px}.detail-note{grid-column:1/-1}.manual-form{grid-template-columns:1fr 1fr}.manual-form input{grid-column:1/-1}.manual-form button{grid-column:1/-1}.flow-key{font-size:8px}.flow-key b{width:20px;height:20px}}
+@media(max-width:420px){body[data-view="simple"] .position-summary{grid-template-columns:1fr 1fr}body[data-view="simple"] .position-summary .metric:nth-child(3){grid-column:1/-1}.header-actions .btn{padding:8px 9px;font-size:10px}.brand-logo{width:34px}.view-btn{padding:7px 8px}.view-switch{margin-right:auto}.position-summary{grid-template-columns:1fr 1fr}.metric{padding:10px}.metric-value{font-size:19px}.connection-grid{grid-template-columns:1fr}.connection-grid #chain,.connection-grid #address{grid-column:auto}.move-preview{gap:8px;flex-direction:column}.manual-form{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* FISD XC paired-interface system — shared interaction and data language */
+:root{--fisd-paper:#f8f8f5;--fisd-ink:#11110f;--fisd-slate:#bdcbd4;--fisd-moss:#173523;--fisd-violet-wash:rgba(139,119,202,.12);--fisd-peach-wash:rgba(211,151,108,.12);--fisd-green-wash:rgba(73,139,93,.12)}
+[data-theme="light"]{--bg:#f8f8f5;--panel:#fff;--panel2:#f1f2ef;--fg:#11110f;--muted:#5e655e;--faint:#7a817a;--line:#d2d6d0;--line2:#a1aaa2;--accent:#173523;--soft:rgba(23,53,35,.08);--shadow:rgba(0,0,0,.11)}
+[data-theme="dark"]{--bg:#08090c;--panel:#0e1015;--panel2:#12151b;--fg:#f3f4f5;--muted:#a3a9b4;--faint:#6e7683;--line:#292e38;--line2:#49515e;--accent:#bdcbd4;--soft:rgba(189,203,212,.09);--shadow:rgba(0,0,0,.38)}
+.interaction-hint{display:flex;gap:12px;align-items:baseline;padding:9px 0 2px;color:var(--muted);font-size:9px;line-height:1.55;letter-spacing:.02em}.interaction-hint b{font:700 8px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.13em;color:var(--fg);white-space:nowrap}
+.shared-impact-summary{min-width:0}
+.hero-metric{display:flex;justify-content:space-between;align-items:flex-end;gap:15px}.hero-metric-caption{font-size:10px;line-height:1.5;color:var(--muted);margin-top:5px}.hero-score-wrap{display:flex;align-items:baseline;gap:5px;white-space:nowrap}.hero-score-wrap strong{font-size:clamp(44px,6vw,82px);font-weight:600;line-height:.9;letter-spacing:-.075em;font-variant-numeric:tabular-nums}.hero-score-wrap span{font-size:11px;color:var(--muted)}
+.mini-score-parts{display:grid;gap:7px;min-width:0}.mini-score-row{display:grid;grid-template-columns:minmax(86px,1fr) minmax(70px,2.3fr) auto;gap:9px;align-items:center;font-size:8px;color:var(--muted);letter-spacing:.02em}.mini-score-row b{font-weight:650;color:var(--fg);white-space:nowrap}.mini-score-row i{height:5px;display:block;position:relative;overflow:hidden;border-radius:99px;background:var(--line)}.mini-score-row i::after{content:"";display:block;width:var(--bar-width,0%);height:100%;background:var(--accent);border-radius:99px;transition:width .35s ease}.flow-steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.flow-steps span{display:flex;align-items:center;gap:8px;min-width:0;font-size:9px;color:var(--muted)}.flow-steps b{display:grid;place-items:center;width:23px;height:23px;border:1px solid var(--line2);border-radius:50%;font:700 8px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--fg);flex:0 0 auto}
+.fisd-insight{position:fixed;z-index:140;display:none;width:min(330px,calc(100vw - 24px));padding:13px 14px;background:var(--fg);color:var(--bg);border:1px solid var(--fg);box-shadow:0 17px 48px var(--shadow);pointer-events:none;letter-spacing:.02em}.fisd-insight.visible{display:block}.fisd-insight-kicker{font:700 8px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.13em;opacity:.58;margin-bottom:7px}.fisd-insight-title{font-size:12px;font-weight:800;line-height:1.35;margin-bottom:7px}.fisd-insight-copy{font-size:10px;line-height:1.6}.fisd-insight-pair{margin-top:10px;padding-top:9px;border-top:1px solid color-mix(in srgb,var(--bg) 26%,transparent)}.fisd-insight-pair b{display:block;text-transform:uppercase;font-size:7px;letter-spacing:.11em;opacity:.65;margin-bottom:5px}.fisd-insight-pair span{font-size:10px;line-height:1.5;font-weight:700}.fisd-insight-pair small{display:block;font-size:9px;line-height:1.5;opacity:.7;margin-top:4px}
+.fisd-pickable{transition:transform .18s ease,outline-color .18s ease,box-shadow .18s ease,border-color .18s ease;touch-action:pan-y;-webkit-touch-callout:none}.fisd-pickable.press-pending{outline:1px solid var(--accent);outline-offset:2px}.fisd-pickable.long-pressed{outline:2px solid var(--accent);outline-offset:3px;box-shadow:0 0 0 6px var(--soft)!important}.fisd-selected-card{outline:2px solid var(--accent)!important;outline-offset:2px;box-shadow:0 0 0 6px var(--soft)!important}.metric{cursor:pointer}.metric:hover{border-color:var(--line2)}.chart .node{cursor:pointer}.chart .node:hover,.chart .node:focus{stroke-width:3;filter:drop-shadow(0 0 5px var(--accent));outline:none}.chart [data-index]{cursor:pointer}.tx-panel tr[data-row]{cursor:pointer;transition:background .15s,box-shadow .15s}.tx-panel tr[data-row]:hover{background:var(--soft)}.tx-panel tr[data-row].selected{background:var(--soft);box-shadow:inset 3px 0 0 var(--accent)}.move-card{touch-action:pan-y}.move-card.chosen{box-shadow:0 0 0 3px var(--soft);transform:translateY(-2px)}.move-card:focus-visible,.metric:focus-visible,.tx-panel tr[data-row]:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+@media(max-width:760px){.interaction-hint{align-items:flex-start}.interaction-hint b{padding-top:2px}.mini-score-row{grid-template-columns:minmax(85px,1fr) minmax(60px,1.5fr) auto}.fisd-insight{left:12px!important;right:12px!important;bottom:12px!important;top:auto!important;width:auto}.flow-steps{gap:10px}.flow-steps span{font-size:8px}}
+@media(prefers-reduced-motion:reduce){.fisd-pickable,.mini-score-row i::after{transition:none!important}}
+
+/* Data-card / mobile-first expression — one vertical path, scalable to desktop */
+body[data-layout="cards"] .shell{width:min(1320px,100%);padding:clamp(10px,2vw,26px) clamp(10px,2.1vw,28px) 32px}
+body[data-layout="cards"] .intro{display:grid;grid-template-columns:1fr;gap:10px;padding:18px 0 0;align-items:stretch}
+body[data-layout="cards"] .intro-main{max-width:none;border:1px solid var(--line);border-radius:26px;padding:clamp(22px,4vw,48px);background:linear-gradient(132deg,var(--soft),transparent 60%),var(--panel)}
+body[data-layout="cards"] .intro h1{font-size:clamp(35px,5.3vw,64px);line-height:.98;letter-spacing:-.065em;margin:12px 0 14px}
+body[data-layout="cards"] .intro-main p{max-width:680px;font-size:clamp(11px,1vw,13px)}
+body[data-layout="cards"] .shared-impact-summary{display:grid;gap:16px;padding:clamp(18px,3vw,28px);border:1px solid var(--line);border-radius:26px;background:linear-gradient(125deg,var(--fisd-violet-wash),transparent 45%),linear-gradient(300deg,var(--fisd-peach-wash),transparent 50%),var(--panel)}
+body[data-layout="cards"] .hero-score-wrap strong{font-size:clamp(50px,7.5vw,94px);font-weight:500}
+body[data-layout="cards"] .flow-steps{grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);padding-top:14px}
+body[data-layout="cards"] .flow-steps span{align-items:flex-start;flex-direction:column;font-size:9px}
+body[data-layout="cards"] .flow-steps b{width:27px;height:27px;border-radius:50%;background:var(--soft)}
+body[data-layout="cards"] .connect{border-radius:20px;padding:16px;background:var(--panel);box-shadow:0 12px 36px var(--shadow)}
+body[data-layout="cards"] .surface{border:0;border-radius:0;background:transparent;overflow:visible}
+body[data-layout="cards"] .position-summary{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:10px;border:0;margin-bottom:12px}
+body[data-layout="cards"] .metric{grid-column:span 6;border:1px solid var(--line);border-radius:22px;padding:clamp(15px,2.2vw,24px);background:var(--panel);min-height:116px;box-shadow:0 8px 24px var(--shadow);position:relative;overflow:hidden}
+body[data-layout="cards"] .metric:nth-child(1){background:linear-gradient(135deg,var(--fisd-slate-wash,rgba(189,203,212,.16)),transparent 72%),var(--panel)}
+body[data-layout="cards"] .metric:nth-child(2){background:linear-gradient(135deg,var(--fisd-green-wash),transparent 75%),var(--panel)}
+body[data-layout="cards"] .metric:nth-child(3){grid-column:span 7;background:linear-gradient(125deg,var(--fisd-violet-wash),transparent 75%),var(--panel)}
+body[data-layout="cards"] .metric:nth-child(4){grid-column:span 5;background:linear-gradient(135deg,var(--fisd-peach-wash),transparent 75%),var(--panel)}
+body[data-layout="cards"] .metric-label{font-size:9px}
+body[data-layout="cards"] .metric-value{font-size:clamp(22px,3.1vw,38px);font-weight:500;line-height:1.02;margin:13px 0 6px}
+body[data-layout="cards"] .position-visual-head{border:1px solid var(--line);border-radius:22px 22px 0 0;background:var(--panel);padding:18px 18px 8px}
+body[data-layout="cards"] .chart-wrap{border:1px solid var(--line);border-top:0;border-radius:0 0 22px 22px;background:var(--panel);padding:8px 12px 15px;overflow-x:auto}
+body[data-layout="cards"] .chart{min-width:680px}
+body[data-layout="cards"] .move-card{border-radius:22px;padding:18px;min-height:235px;background:linear-gradient(145deg,var(--soft),transparent 58%),var(--panel)}
+body[data-layout="cards"] .move-card h3{font-size:clamp(17px,1.5vw,23px);letter-spacing:-.035em}
+body[data-layout="cards"] .move-card.chosen{box-shadow:0 0 0 2px var(--accent),0 14px 36px var(--shadow);background:linear-gradient(145deg,var(--fisd-green-wash),transparent 68%),var(--panel)}
+body[data-layout="cards"] .panel,body[data-layout="cards"] .manual{border-radius:22px;box-shadow:0 8px 26px var(--shadow)}
+body[data-layout="cards"] .tx-panel{overflow:hidden}
+body[data-layout="cards"] .section{margin-top:24px}
+@media(max-width:760px){body[data-layout="cards"] .flow-steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}body[data-layout="cards"] .metric{grid-column:span 6;min-height:112px}body[data-layout="cards"] .metric:nth-child(1){grid-column:span 12}body[data-layout="cards"] .metric:nth-child(3){grid-column:span 12}body[data-layout="cards"] .metric:nth-child(4){grid-column:span 6}body[data-layout="cards"] .chart{min-width:700px}}
+@media(max-width:440px){body[data-layout="cards"] .intro-main{padding:22px 18px;border-radius:23px}body[data-layout="cards"] .intro h1{font-size:clamp(34px,11vw,47px)}body[data-layout="cards"] .shared-impact-summary{padding:18px;border-radius:23px}body[data-layout="cards"] .hero-metric{align-items:flex-start;flex-direction:column-reverse;gap:6px}body[data-layout="cards"] .hero-score-wrap strong{font-size:62px}body[data-layout="cards"] .metric{grid-column:span 12!important;min-height:96px}body[data-layout="cards"] .metric:nth-child(2){grid-column:span 6!important}body[data-layout="cards"] .metric:nth-child(4){grid-column:span 6!important}body[data-layout="cards"] .metric-value{font-size:28px}body[data-layout="cards"] .connect{padding:12px;border-radius:18px}body[data-layout="cards"] .position-visual-head{padding:14px 12px 8px}body[data-layout="cards"] .chart-wrap{padding:8px;border-radius:0 0 18px 18px}}
+
+</style>
+</head>
+<body data-theme="light" data-view="simple" data-layout="cards">
+<div class="shell">
+<header class="header">
+ <div class="brand"><svg class="brand-logo" role="img" aria-label="FISD XC" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 655 464" role="img" aria-label="FISD XC"><title>FISD XC</title><path d="M 572 7 L 543 7 L 543 58 L 542 59 L 540 59 L 535 56 L 533 56 L 532 55 L 530 55 L 529 54 L 527 54 L 526 53 L 523 53 L 522 52 L 518 52 L 517 51 L 511 51 L 510 50 L 489 50 L 488 51 L 482 51 L 481 52 L 476 52 L 475 53 L 472 53 L 471 54 L 469 54 L 468 55 L 465 55 L 462 57 L 457 58 L 456 59 L 455 59 L 454 60 L 441 66 L 439 68 L 438 68 L 434 71 L 434 176 L 437 179 L 438 179 L 441 182 L 442 182 L 447 186 L 448 186 L 457 191 L 459 191 L 462 193 L 465 193 L 466 194 L 468 194 L 469 195 L 473 195 L 474 196 L 481 196 L 482 197 L 499 197 L 500 196 L 505 196 L 506 195 L 510 195 L 511 194 L 513 194 L 514 193 L 519 192 L 522 190 L 524 190 L 525 189 L 528 188 L 530 186 L 531 186 L 532 185 L 535 184 L 537 182 L 538 182 L 544 177 L 545 178 L 545 181 L 546 182 L 546 188 L 547 189 L 547 193 L 572 193 L 573 192 L 573 8 Z M 102 211 L 104 213 L 105 216 L 107 218 L 108 221 L 110 223 L 112 228 L 114 230 L 115 233 L 117 235 L 118 238 L 120 240 L 121 243 L 123 245 L 125 250 L 127 252 L 128 255 L 130 257 L 131 260 L 133 262 L 135 267 L 137 269 L 138 272 L 140 274 L 141 277 L 143 279 L 144 282 L 146 284 L 148 289 L 150 291 L 151 294 L 153 296 L 154 299 L 156 301 L 157 304 L 159 306 L 161 311 L 164 314 L 164 315 L 173 324 L 174 324 L 176 326 L 177 326 L 179 328 L 180 328 L 183 330 L 183 331 L 182 332 L 179 333 L 177 335 L 176 335 L 174 337 L 173 337 L 164 346 L 164 347 L 161 350 L 159 355 L 157 357 L 156 360 L 154 362 L 153 365 L 151 367 L 150 370 L 148 372 L 146 377 L 144 379 L 143 382 L 141 384 L 140 387 L 138 389 L 137 392 L 135 394 L 133 399 L 131 401 L 130 404 L 128 406 L 127 409 L 125 411 L 125 412 L 122 416 L 120 421 L 118 423 L 117 426 L 115 428 L 114 431 L 112 433 L 111 436 L 109 438 L 109 439 L 106 444 L 134 444 L 135 443 L 136 440 L 138 438 L 140 433 L 142 431 L 143 428 L 145 426 L 147 421 L 149 419 L 150 416 L 152 414 L 153 411 L 155 409 L 157 404 L 159 402 L 160 399 L 162 397 L 164 392 L 166 390 L 167 387 L 169 385 L 170 382 L 172 380 L 174 375 L 176 373 L 177 370 L 179 368 L 180 365 L 182 363 L 182 362 L 190 354 L 191 354 L 196 351 L 200 351 L 201 350 L 254 350 L 255 351 L 258 351 L 259 352 L 261 352 L 262 353 L 263 353 L 265 355 L 266 355 L 273 362 L 273 363 L 275 365 L 279 374 L 281 376 L 287 389 L 289 391 L 289 392 L 290 393 L 296 406 L 298 408 L 304 421 L 306 423 L 306 424 L 307 425 L 312 436 L 314 438 L 316 443 L 317 444 L 343 444 L 343 442 L 341 440 L 341 439 L 340 438 L 334 425 L 332 423 L 326 410 L 324 408 L 324 407 L 323 406 L 317 393 L 315 391 L 315 390 L 314 389 L 308 376 L 306 374 L 306 373 L 305 372 L 299 359 L 297 357 L 294 350 L 292 348 L 292 347 L 282 337 L 281 337 L 276 333 L 273 332 L 272 331 L 272 330 L 276 327 L 277 327 L 281 324 L 282 324 L 291 315 L 291 314 L 295 309 L 300 298 L 302 296 L 308 283 L 310 281 L 316 268 L 318 266 L 318 265 L 319 264 L 325 251 L 327 249 L 333 236 L 335 234 L 335 233 L 336 232 L 342 219 L 344 217 L 347 210 L 321 210 L 319 212 L 315 221 L 313 223 L 313 224 L 312 225 L 306 238 L 304 240 L 298 253 L 296 255 L 296 256 L 295 257 L 289 270 L 287 272 L 287 273 L 286 274 L 281 285 L 279 287 L 275 296 L 273 298 L 273 299 L 266 306 L 265 306 L 261 309 L 259 309 L 258 310 L 255 310 L 254 311 L 201 311 L 200 310 L 196 310 L 195 309 L 190 307 L 182 299 L 182 298 L 180 296 L 179 293 L 177 291 L 176 288 L 174 286 L 172 281 L 170 279 L 169 276 L 167 274 L 166 271 L 164 269 L 162 264 L 160 262 L 159 259 L 157 257 L 155 252 L 153 250 L 152 247 L 150 245 L 149 242 L 147 240 L 145 235 L 143 233 L 142 230 L 140 228 L 138 223 L 136 221 L 135 218 L 133 216 L 133 215 L 130 211 L 130 210 L 103 210 Z M 391 237 L 380 248 L 380 249 L 375 254 L 375 255 L 369 263 L 369 264 L 362 277 L 362 279 L 361 280 L 361 282 L 360 283 L 360 285 L 359 286 L 359 289 L 358 290 L 358 293 L 357 294 L 357 299 L 356 300 L 356 310 L 355 311 L 355 346 L 356 347 L 356 358 L 357 359 L 357 363 L 358 364 L 358 368 L 359 369 L 359 371 L 360 372 L 360 375 L 361 376 L 361 378 L 363 381 L 363 383 L 364 384 L 368 393 L 370 395 L 370 396 L 372 398 L 372 399 L 374 401 L 374 402 L 377 405 L 377 406 L 394 423 L 395 423 L 398 426 L 399 426 L 407 432 L 408 432 L 417 437 L 419 437 L 422 439 L 424 439 L 425 440 L 427 440 L 428 441 L 431 441 L 432 442 L 435 442 L 436 443 L 440 443 L 441 444 L 450 444 L 451 445 L 576 445 L 576 420 L 449 420 L 448 419 L 442 419 L 441 418 L 438 418 L 437 417 L 434 417 L 433 416 L 431 416 L 428 414 L 426 414 L 425 413 L 422 412 L 420 410 L 417 409 L 411 404 L 410 404 L 396 390 L 396 389 L 393 386 L 393 385 L 391 383 L 389 378 L 387 376 L 387 374 L 385 371 L 385 369 L 384 368 L 384 366 L 383 365 L 383 363 L 382 362 L 382 358 L 381 357 L 381 351 L 380 350 L 380 308 L 381 307 L 381 300 L 382 299 L 382 296 L 383 295 L 383 292 L 384 291 L 384 289 L 386 286 L 386 284 L 387 283 L 389 278 L 391 276 L 391 275 L 393 273 L 393 272 L 395 270 L 395 269 L 401 263 L 401 262 L 411 253 L 412 253 L 420 247 L 421 247 L 426 244 L 428 244 L 429 243 L 430 243 L 431 242 L 433 242 L 434 241 L 437 241 L 438 240 L 441 240 L 442 239 L 447 239 L 448 238 L 576 238 L 576 213 L 446 213 L 445 214 L 439 214 L 438 215 L 434 215 L 433 216 L 430 216 L 429 217 L 427 217 L 426 218 L 421 219 L 418 221 L 416 221 L 415 222 L 408 225 L 406 227 L 403 228 L 397 233 L 396 233 L 392 237 Z M 404 60 L 403 60 L 402 59 L 400 59 L 399 58 L 397 58 L 396 57 L 394 57 L 393 56 L 390 56 L 389 55 L 387 55 L 386 54 L 382 54 L 381 53 L 377 53 L 376 52 L 371 52 L 370 51 L 361 51 L 360 50 L 334 50 L 333 51 L 326 51 L 325 52 L 320 52 L 319 53 L 316 53 L 315 54 L 312 54 L 311 55 L 308 55 L 307 56 L 305 56 L 302 58 L 297 59 L 296 60 L 283 66 L 281 68 L 278 69 L 276 71 L 276 124 L 277 124 L 278 125 L 286 125 L 287 126 L 294 126 L 295 127 L 303 127 L 304 128 L 312 128 L 313 129 L 321 129 L 322 130 L 330 130 L 331 131 L 339 131 L 340 132 L 348 132 L 349 133 L 357 133 L 358 134 L 366 134 L 367 135 L 375 135 L 378 137 L 378 159 L 376 161 L 375 161 L 368 165 L 366 165 L 363 167 L 360 167 L 359 168 L 356 168 L 355 169 L 351 169 L 350 170 L 344 170 L 343 171 L 319 171 L 318 170 L 310 170 L 309 169 L 305 169 L 304 168 L 300 168 L 299 167 L 296 167 L 295 166 L 292 166 L 291 165 L 288 165 L 287 164 L 285 164 L 284 163 L 279 162 L 276 160 L 276 187 L 277 187 L 278 188 L 280 188 L 281 189 L 283 189 L 284 190 L 286 190 L 287 191 L 289 191 L 290 192 L 293 192 L 294 193 L 298 193 L 299 194 L 303 194 L 304 195 L 310 195 L 311 196 L 320 196 L 321 197 L 344 197 L 345 196 L 353 196 L 354 195 L 359 195 L 360 194 L 364 194 L 365 193 L 367 193 L 368 192 L 371 192 L 372 191 L 374 191 L 375 190 L 380 189 L 383 187 L 385 187 L 386 186 L 397 181 L 399 179 L 402 178 L 405 175 L 405 122 L 404 121 L 398 121 L 397 120 L 390 120 L 389 119 L 381 119 L 380 118 L 372 118 L 371 117 L 363 117 L 362 116 L 354 116 L 353 115 L 345 115 L 344 114 L 336 114 L 335 113 L 327 113 L 326 112 L 318 112 L 317 111 L 309 111 L 308 110 L 304 110 L 303 109 L 303 87 L 312 82 L 314 82 L 315 81 L 317 81 L 318 80 L 320 80 L 321 79 L 324 79 L 325 78 L 329 78 L 330 77 L 337 77 L 338 76 L 358 76 L 359 77 L 368 77 L 369 78 L 375 78 L 376 79 L 380 79 L 381 80 L 384 80 L 385 81 L 388 81 L 389 82 L 391 82 L 392 83 L 395 83 L 396 84 L 398 84 L 401 86 L 403 86 L 404 87 L 405 87 L 405 61 Z M 192 7 L 190 7 L 189 6 L 186 6 L 185 5 L 181 5 L 180 4 L 175 4 L 174 3 L 150 3 L 149 4 L 144 4 L 143 5 L 140 5 L 139 6 L 137 6 L 136 7 L 134 7 L 133 8 L 128 9 L 127 10 L 116 15 L 114 17 L 113 17 L 105 23 L 105 65 L 103 67 L 94 67 L 93 68 L 85 68 L 84 69 L 79 69 L 79 90 L 80 91 L 104 91 L 105 92 L 105 193 L 135 193 L 135 92 L 136 91 L 192 91 L 192 66 L 136 66 L 135 65 L 135 38 L 138 35 L 139 35 L 148 30 L 151 30 L 152 29 L 155 29 L 156 28 L 164 28 L 165 27 L 170 27 L 171 28 L 180 28 L 181 29 L 185 29 L 186 30 L 189 30 L 190 31 L 193 31 L 193 8 Z M 469 85 L 470 85 L 475 82 L 477 82 L 480 80 L 482 80 L 483 79 L 486 79 L 487 78 L 492 78 L 493 77 L 514 77 L 515 78 L 519 78 L 520 79 L 523 79 L 524 80 L 529 81 L 530 82 L 531 82 L 532 83 L 534 83 L 538 86 L 541 87 L 543 89 L 543 155 L 539 158 L 538 158 L 536 160 L 535 160 L 533 162 L 532 162 L 527 165 L 525 165 L 522 167 L 520 167 L 519 168 L 516 168 L 515 169 L 511 169 L 510 170 L 501 170 L 500 171 L 499 171 L 498 170 L 487 170 L 486 169 L 483 169 L 482 168 L 477 167 L 476 166 L 471 164 L 469 162 L 468 162 L 464 158 L 464 89 Z M 215 54 L 215 193 L 244 193 L 245 192 L 245 55 L 244 54 Z M 212 3 L 212 30 L 247 30 L 247 3 Z" fill="currentColor" fill-rule="evenodd"/><g fill="none" stroke="currentColor" stroke-width="1" opacity=".23"><path d="M6 455.5H95"/><path d="M105 455.5H278"/><path d="M291 455.5H650"/></g></svg><div><div class="brandname">FISD XC <span>/ OPS</span></div><div class="branddesc">Onchain impact operations · Blockscout Pro API</div></div></div>
+ <div class="header-actions">
+  <div class="view-switch" role="group" aria-label="Dashboard detail level"><button class="view-btn active" id="simpleViewBtn" type="button" aria-pressed="true">Simple</button><button class="view-btn" id="complexViewBtn" type="button" aria-pressed="false">Full workings</button></div>
+  <span class="pill"><i class="dot warn" id="providerDot"></i><span id="providerState">DEMO DATA</span></span>
+  <button class="btn" id="traceBtn">Trace model</button><button class="btn" id="themeBtn">Light mode</button><a class="btn subtle" href="https://dev.blockscout.com/" target="_blank" rel="noopener">API key ↗</a>
+ </div>
+</header>
+<section class="intro">
+ <div class="intro-main"><div class="eyebrow">FISD XC / OPS · DECISION BOARD</div><h1>See the signal.<br><em>Choose the move.</em></h1><p>Current position → next best move → expected effect → verification. Blockscout supplies the evidence. FISD XC organises it into an inspectable operational decision.</p></div>
+ <div class="flow-key shared-impact-summary" aria-label="Impact metrics and decision sequence">
+ <div class="hero-metric"><div><div class="eyebrow">IMPACT METRICS</div><div class="hero-metric-caption">Average signal · current sample</div></div><div class="hero-score-wrap"><strong id="editorialScore">—</strong><span>/100</span></div></div>
+ <div class="mini-score-parts" id="editorialMiniBars" aria-live="polite"><div class="mini-score-row"><span>Waiting for a transaction sample</span><i></i></div></div>
+ <div class="flow-steps" aria-label="Decision sequence"><span><b>01</b> Current position</span><span><b>02</b> Next best move</span><span><b>03</b> Move board</span><span><b>04</b> Verify outcome</span></div>
+</div>
+</section>
+<div class="view-note" id="viewModeNote"><strong>SIMPLE VIEW</strong><span>One recommended action, the evidence behind it, and a short list of practical alternatives. Full workings exposes the score model and provider details.</span></div>
+<div class="interaction-hint"><b>INTERACT</b><span>Hover to understand · tap to select · long-press to inspect. Haptic feedback activates where the browser supports it.</span></div>
+<section class="connect" id="sourceConnect" aria-label="Connect a Blockscout address">
+ <div class="connect-head"><div><div class="connect-title">Connect current position</div><div class="connect-note">Enter a public wallet or contract. Demo records are simulated; live evidence requires the server-side Blockscout Pro API configuration.</div></div><span class="tag" id="connectionMode">SIMULATION</span></div>
+ <div class="connection-grid">
+  <select class="control" id="chain" aria-label="Select blockchain"><option value="1">Ethereum · 1</option><option value="10">Optimism · 10</option><option value="100">Gnosis · 100</option><option value="137">Polygon · 137</option><option value="42161">Arbitrum · 42161</option><option value="8453">Base · 8453</option></select>
+  <input class="control mono" id="address" autocomplete="off" spellcheck="false" placeholder="0x wallet / contract address" aria-label="Wallet or contract address">
+  <button class="btn primary" id="connectBtn">Connect live</button><button class="btn" id="demoBtn">Load demo</button>
+ </div>
+ <div class="connect-foot"><span id="connectionMessage">Demo mode is active. Connect a Blockscout Pro API key on the server to load actual chain data.</span><span id="lastUpdated">No live query yet</span></div>
+</section>
+
+<main>
+<section class="section" id="currentPosition">
+ <div class="section-head"><div><div class="section-kicker">01 / ORIENT</div><h2 class="section-title">Current position</h2><div class="section-help">A single place to understand the selected source, recent activity, and where the strongest signals sit in time.</div></div><span class="pill"><i class="dot good"></i><span id="positionLabel">SELECTED SOURCE</span></span></div>
+ <div class="surface">
+  <div class="position-summary">
+   <div class="metric"><div class="metric-label">Tracked source</div><div class="metric-value" id="metricSource">DEMO WALLET</div><div class="metric-foot" id="metricChain">Ethereum · simulated</div></div>
+   <div class="metric"><div class="metric-label">Transactions sampled</div><div class="metric-value" id="metricTx">12</div><div class="metric-foot" id="metricTxFoot">recent sample window</div></div>
+   <div class="metric"><div class="metric-label">Average signal</div><div class="metric-value" id="metricScore">—</div><div class="metric-foot">triage index · 0–100</div></div>
+   <div class="metric advanced-only"><div class="metric-label">Native value sampled</div><div class="metric-value" id="metricValue">—</div><div class="metric-foot" id="metricValueFoot">native asset · not USD</div></div>
+  </div>
+  <div class="position-visual-head"><div><div class="panel-title">Impact field + temporal trace</div><div class="panel-sub">Select a node or event to focus its evidence and next move.</div></div><div class="legend"><span><i></i> Signal node</span><span>— event connector</span></div></div>
+  <div class="chart-wrap"><svg class="chart" id="chart" viewBox="0 0 960 590" role="img" aria-label="Impact field and chronological transaction trace"></svg></div>
+  <div class="chart-caption"><span id="chartSource">DEMO / simulated transaction evidence</span><span>Signal scores prioritise inspection; they are not financial valuations or fraud findings.</span></div>
+ </div>
+</section>
+
+<section class="section" id="nextBestMove">
+ <div class="section-head"><div><div class="section-kicker">02 / DECIDE</div><h2 class="section-title">Next best move</h2><div class="section-help">One primary recommendation, tied to the selected transaction. The action is advisory; it does not execute an on-chain transaction.</div></div><span class="score-badge" id="actionScore">— / 100</span></div>
+ <div class="surface next-move">
+  <div class="next-main"><div class="action-head"><i class="dot good" id="actionDot"></i><span class="action-type" id="actionType">WAITING FOR DATA</span></div><h3 class="action-title" id="actionTitle">Connect a wallet to begin.</h3><div class="action-copy" id="actionCopy">FISD will inspect observed transactions and recommend a concrete next review step. The recommendation links back to source evidence.</div><div class="next-actions"><button class="btn primary" id="primaryMoveBtn">Inspect recommended evidence ↓</button><button class="btn" id="methodBtn">How is this decided?</button></div></div>
+  <div class="next-meta"><div class="next-meta-item"><div class="meta-label">Selected evidence</div><div class="meta-value mono" id="actionEvidence">—</div></div><div class="next-meta-item"><div class="meta-label">Paired function</div><div class="meta-value" id="actionPair">—</div></div><div class="next-meta-item"><div class="meta-label">Decision boundary</div><div class="meta-value">Human review required</div></div></div>
+ </div>
+</section>
+
+<section class="section" id="moveBoardSection">
+ <div class="section-head"><div><div class="section-kicker">03 / PREVIEW</div><h2 class="section-title">Move board</h2><div class="section-help">Treat these as operational moves, not decorative cards. Choose a move to preview its effect; use its action to inspect evidence, compare context, or start monitoring.</div></div><span class="tag">NO AUTONOMOUS EXECUTION</span></div>
+ <div class="move-board" id="moveBoardCards" aria-live="polite"></div>
+ <div class="move-preview"><div class="move-preview-tag" id="movePreviewState">RECOMMENDED</div><div><strong id="movePreviewTitle">Inspect the selected evidence</strong><span id="movePreviewCopy">The selected move will explain its intended effect here.</span></div></div>
+</section>
+
+<section class="section" id="verifyOutcome">
+ <div class="section-head"><div><div class="section-kicker">04 / VERIFY</div><h2 class="section-title">Verify outcome</h2><div class="section-help">Evidence remains separate from interpretation. The local review marker records an operator action; it does not certify or change an on-chain outcome.</div></div><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn" id="refreshBtn">Refresh</button><button class="btn advanced-only" id="monitorBtn">Start monitor</button></div></div>
+ <div class="surface">
+  <div class="verify-top"><div class="verify-symbol">↗</div><div><div class="verify-state" id="verifyState">WAITING FOR EVIDENCE</div><div class="verify-title" id="verifyTitle">Select a signal to begin verification.</div><div class="verify-copy" id="verifyCopy">Choose a timeline node or transaction row to inspect the source record.</div></div><div class="verify-tools"><button class="btn" id="markReviewedBtn" disabled>Mark reviewed</button><span class="tag" id="refreshStatus">Manual</span></div></div>
+  <div class="panel-head"><div><div class="panel-title">Recent transaction evidence</div><div class="panel-sub">Select a row to connect it to the impact field and recommended move.</div></div><span class="tag" id="explorerStatus">Demo links</span></div>
+  <div class="table-wrap"><table><thead><tr><th>Observed at</th><th>Direction / type</th><th>Transaction</th><th>Value</th><th>Signal</th><th>Outcome</th><th>Evidence</th></tr></thead><tbody id="txRows"><tr><td class="empty-row" colspan="7">Load demo data or connect a Blockscout source.</td></tr></tbody></table></div>
+  <div class="detail" id="detail"><div class="detail-note">Select a transaction to view its hash, parties, block and source explorer link.</div></div>
+ </div>
+</section>
+
+<section class="section advanced-only" id="fullWorkings">
+ <div class="section-head"><div><div class="section-kicker">FULL WORKINGS / AUDIT</div><h2 class="section-title">Show the complete reasoning</h2><div class="section-help">The same selected transaction, exposed with the contributing score components, method, source provenance and operator annotation tools.</div></div></div>
+ <div class="advanced-grid">
+  <section class="surface" id="scorePanel"><div class="panel-head"><div><div class="panel-title">Signal composition</div><div class="panel-sub">Explicit heuristic inputs for the selected transaction.</div></div><span class="score-badge" id="breakdownTotal">— / 100</span></div><div class="panel-body"><div id="scoreBreakdown"><div class="panel-sub">Select a transaction to inspect score contributions.</div></div><div class="breakdown-foot">Triage heuristic only. Contributions are relative to the loaded sample and are not a fraud verdict.</div></div></section>
+  <section class="surface"><div class="panel-head"><div><div class="panel-title">Model sequence</div><div class="panel-sub">From evidence to action, then back to verification.</div></div><button class="btn" id="traceBtnDuplicate" type="button">Trace model</button></div><div class="panel-body"><div class="rule-list"><div class="rule"><span class="rule-n">01</span><div><b>Observe</b><p>Blockscout address and transaction history establish the facts.</p></div></div><div class="rule"><span class="rule-n">02</span><div><b>Score</b><p>Recency, native value, contract interaction, outcome and direction form a transparent triage heuristic.</p></div></div><div class="rule"><span class="rule-n">03</span><div><b>Relate</b><p>Time-ordered nodes connect activity to the selected evidence.</p></div></div><div class="rule"><span class="rule-n">04</span><div><b>Act</b><p>Recommended move and alternatives are offered for operator selection.</p></div></div><div class="rule"><span class="rule-n">05</span><div><b>Verify</b><p>The explorer link supports source checking; local review status remains explicitly local.</p></div></div></div></div></section>
+  <section class="surface"><div class="panel-head"><div><div class="panel-title">Provider status</div><div class="panel-sub">Actual provenance when live mode is connected.</div></div></div><div class="panel-body api-status"><div class="api-row"><span>Data provider</span><b>Blockscout Pro API</b></div><div class="api-row"><span>Address balance</span><b id="addressBalance">—</b></div><div class="api-row"><span>Source endpoint</span><b id="apiEndpoint">—</b></div><div class="api-row"><span>Explorer evidence</span><b id="explorerStatusComplex">See Verify Outcome</b></div><div class="api-row"><span>Refresh interval</span><b id="refreshStatusComplex">Manual</b></div><div class="api-row"><span>API key exposure</span><b>Server-side env</b></div><div id="providerNote" class="panel-sub">No key is stored in this browser. Live requests use BLOCKSCOUT_PRO_API_KEY on the server.</div></div></section>
+  <section class="surface"><div class="panel-head"><div><div class="panel-title">Method and limitations</div><div class="panel-sub">The score is triage guidance, not a guarantee.</div></div><button class="btn" id="methodBtnDuplicate" type="button">Score method</button></div><div class="panel-body"><p class="panel-sub" style="font-size:10px;line-height:1.7">Each score combines recency, native-value magnitude relative to the loaded sample, interaction type, observed outcome and direction. Recommendations are rules-based. A high score means “inspect sooner,” not “fraud.” Verify every live claim against the linked Explorer record.</p></div></section>
+ </div>
+ <section class="manual"><div class="eyebrow">FISD manual overlay</div><div style="font-size:12px;font-weight:800;margin-top:5px">Add an operational note</div><div class="manual-help">Manual notes are stored in this browser and shown separately from observed blockchain evidence.</div><form class="manual-form" id="noteForm"><input class="control" id="noteName" required placeholder="e.g. Review treasury outflow"><select class="control" id="noteType"><option value="decision">Decision</option><option value="event">Event</option><option value="milestone">Milestone</option><option value="risk">Risk</option><option value="signal">Signal</option></select><select class="control" id="noteImpact"><option value="30">Low signal</option><option selected value="55">Medium signal</option><option value="80">High signal</option></select><button class="btn primary">Add note</button></form></section>
+</section>
+</main>
+<footer class="footer"><span>FISD XC / OPS · Onchain Impact Operations</span><span>Evidence → decision → move preview → verification · Rule-based triage · No autonomous transactions</span></footer>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="modal" id="modal"><div class="modal-card"><div class="eyebrow" id="modalEyebrow">FISD XC</div><h2 id="modalTitle">Signal method</h2><div id="modalBody"></div><div class="modal-actions"><button class="btn primary" id="modalClose">Understood</button></div></div></div>
+<script>
+
+'use strict';
+const $=id=>document.getElementById(id);
+const CHAIN={
+ '1':{name:'Ethereum',symbol:'ETH',explorer:'https://eth.blockscout.com',label:'Ethereum Mainnet'},
+ '10':{name:'Optimism',symbol:'ETH',explorer:'https://optimism.blockscout.com',label:'Optimism'},
+ '100':{name:'Gnosis',symbol:'xDAI',explorer:'https://gnosis.blockscout.com',label:'Gnosis'},
+ '137':{name:'Polygon',symbol:'POL',explorer:'https://polygon.blockscout.com',label:'Polygon'},
+ '42161':{name:'Arbitrum',symbol:'ETH',explorer:'https://arbitrum.blockscout.com',label:'Arbitrum One'},
+ '8453':{name:'Base',symbol:'ETH',explorer:'https://base.blockscout.com',label:'Base'}
+};
+const DEMO_ADDRESS='0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
+let mode='demo', currentAddress=DEMO_ADDRESS, currentChain='1', txs=[], notes=JSON.parse(localStorage.getItem('fisdOpsNotes')||'[]'), selectedTx=null, pollTimer=null, pollOn=false, lastUpdated=null, accountData=null, tokenTransferData=[];
+let health={configured:false};
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function short(v,n=8){if(!v)return '—';return v.length>n*2+3?v.slice(0,n+2)+'…'+v.slice(-n):v}
+function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
+function fmtDate(v){if(!v)return '—';const d=new Date(v);return Number.isNaN(+d)?String(v):d.toLocaleString([], {month:'short',day:'2-digit',hour:'2-digit',minute:'2-digit'})}
+function weiToNative(v){try{if(v===null||v===undefined)return 0;const n=BigInt(String(v));const whole=n/1000000000000000000n;const frac=(n%1000000000000000000n).toString().padStart(18,'0').slice(0,5);return Number(`${whole}.${frac}`)}catch{return Number(v||0)}}
+function nativeString(n){if(!Number.isFinite(n))return '—';if(n===0)return '0';return n.toLocaleString(undefined,{maximumFractionDigits:5})}
+function getExplorer(){return CHAIN[currentChain]?.explorer||'https://eth.blockscout.com'}
+function explorerUrl(tx){return tx.hash?`${getExplorer()}/tx/${encodeURIComponent(tx.hash)}`:getExplorer()}
+function addressUrl(a=currentAddress){return `${getExplorer()}/address/${encodeURIComponent(a)}`}
+function hashValue(tx){return tx.hash||tx.transaction_hash||''}
+function senderHash(tx){return tx.from?.hash||tx.from_hash||tx.from||''}
+function receiverHash(tx){return tx.to?.hash||tx.to_hash||tx.to||''}
+function timeValue(tx){return tx.timestamp||tx.timeStamp||tx.created_at||''}
+function isFailure(tx){return ['error','failed','reverted','false'].includes(String(tx.status||tx.result||'').toLowerCase()) || tx.success===false}
+function transactionNative(tx){if(tx._native!==undefined)return tx._native;return weiToNative(tx.value)}
+function transactionDirection(tx){const f=String(senderHash(tx)).toLowerCase(),t=String(receiverHash(tx)).toLowerCase(),a=currentAddress.toLowerCase();if(f===a&&t===a)return 'SELF';if(f===a)return 'OUT';if(t===a)return 'IN';return 'CALL'}
+function methodName(tx){return tx.method||tx.decoded_input?.method_call||tx.decoded_input?.method||tx.transaction_types?.[0]|| (tx.to?.is_contract?'Contract call':'Transfer')||'Transaction'}
+function scoreTx(tx, all=txs){if(tx._manual)return tx._score||50;const d=transactionDirection(tx),val=transactionNative(tx);const t=new Date(timeValue(tx)).getTime();const ageDays=Number.isFinite(t)?Math.max(0,(Date.now()-t)/86400000):14;const recency=clamp(28-ageDays*3.5,0,28);const maxVal=Math.max(.00001,...all.map(transactionNative));const valueScore=clamp(Math.log10(1+Math.max(0,val))/Math.log10(1+maxVal)*26,0,26);const contract=tx.to?.is_contract||tx.to?.contract_creation_method||String(methodName(tx)).toLowerCase().includes('contract')||String(methodName(tx)).toLowerCase()!=='transfer'?17:5;const outcome=isFailure(tx)?19:15;const direction=(d==='OUT'||d==='CALL')?8:5;return Math.round(clamp(recency+valueScore+contract+outcome+direction,8,100))}
+function scoreParts(tx, all=txs){
+ if(!tx)return [];
+ if(tx._manual)return [{label:'Manual annotation weight',value:tx._score||50,max:100,note:'Operator-assigned; not a chain observation.'}];
+ const d=transactionDirection(tx),val=transactionNative(tx);
+ const t=new Date(timeValue(tx)).getTime();
+ const ageDays=Number.isFinite(t)?Math.max(0,(Date.now()-t)/86400000):14;
+ const recency=clamp(28-ageDays*3.5,0,28);
+ const maxVal=Math.max(.00001,...all.map(transactionNative));
+ const valueScore=clamp(Math.log10(1+Math.max(0,val))/Math.log10(1+maxVal)*26,0,26);
+ const method=String(methodName(tx)).toLowerCase();
+ const contract=tx.to?.is_contract||tx.to?.contract_creation_method||method.includes('contract')||method!=='transfer'?17:5;
+ const outcome=isFailure(tx)?19:15;
+ const direction=(d==='OUT'||d==='CALL')?8:5;
+ return [
+  {label:'Recency',value:recency,max:28,note:'Newer activity receives more weight.'},
+  {label:'Native value',value:valueScore,max:26,note:'Relative to the currently loaded sample; not USD.'},
+  {label:'Interaction type',value:contract,max:17,note:'Contract/non-transfer interaction heuristic.'},
+  {label:'Observed outcome',value:outcome,max:19,note:isFailure(tx)?'Failed/reverted signal weight.':'Successful/other returned outcome weight.'},
+  {label:'Direction',value:direction,max:8,note:(d==='OUT'||d==='CALL')?'Outgoing/call path weight.':'Incoming/other path weight.'}
+ ];
+}
+function renderScoreBreakdown(){
+ const box=$('scoreBreakdown');
+ const total=$('breakdownTotal');
+ if(!box||!total)return;
+ const tx=selectedTx!==null?txs[selectedTx]:null;
+ if(!tx){total.textContent='— / 100';box.innerHTML='<div class="panel-sub">Select a transaction to inspect score contributions.</div>';return;}
+ const totalScore=scoreTx(tx,txs);total.textContent=totalScore+' / 100';
+ const parts=scoreParts(tx,txs);
+ box.innerHTML='<div class="score-parts">'+parts.map(p=>{
+   const value=Number(p.value)||0, pct=p.max?clamp(value/p.max*100,0,100):0;
+   return '<div class="score-part"><div class="score-part-name"><strong>'+esc(p.label)+'</strong><div class="panel-sub">'+esc(p.note||'')+'</div></div><div class="score-part-value">'+Math.round(value)+' / '+p.max+'</div><div class="score-track"><div class="score-fill" style="width:'+pct+'%"></div></div></div>';
+ }).join('')+'</div><div class="breakdown-foot">Component contribution total: '+Math.round(parts.reduce((sum,p)=>sum+Number(p.value||0),0))+' before final rounding/clamping. Displayed overall score: '+totalScore+'/100.</div>';
+}
+
+function classify(tx){const d=transactionDirection(tx);if(isFailure(tx))return 'failed transaction';if(tx.to?.is_contract || String(methodName(tx)).toLowerCase().includes('swap')||String(methodName(tx)).toLowerCase().includes('contract'))return 'contract interaction';if(d==='IN')return 'incoming transfer';if(d==='OUT')return 'outgoing transfer';return 'transaction'}
+function recommendation(tx,score){if(!tx)return {type:'WAITING FOR DATA',title:'Connect a wallet to begin.',copy:'FISD will inspect observed transactions and recommend a concrete next review step.',pair:'—'};const d=transactionDirection(tx),method=String(methodName(tx));if(isFailure(tx))return {type:'ATTENTION · FAILED',title:'Inspect the failed transaction.',copy:'The explorer marks this transaction as failed or reverted. Review the transaction receipt and contract context before repeating the operation.',pair:'Inspect receipt'};if(tx.to?.is_contract||/swap|approve|deposit|withdraw|execute|mint|burn|stake/i.test(method))return {type:'CONTRACT ACTIVITY',title:'Review the contract interaction.',copy:`This activity looks like a contract call (${method}). Open the transaction details and confirm the decoded method, token movement and destination contract.`,pair:'Contract review'};if(d==='OUT'&&transactionNative(tx)>0.1)return {type:'OUTFLOW · REVIEW',title:'Verify the outgoing value and recipient.',copy:'A native-value outflow is a useful triage point. Confirm the destination, purpose and associated token transfers; the score is a heuristic, not a fraud finding.',pair:'Recipient verification'};if(d==='IN'&&transactionNative(tx)>0.1)return {type:'INFLOW · RECONCILE',title:'Reconcile the incoming transfer.',copy:'An incoming native-value transaction was observed. Match it to the expected source or operational event and annotate its purpose if known.',pair:'Reconciliation'};return {type:'ACTIVITY · OBSERVE',title:'Compare this event with its neighbours.',copy:'Review adjacent transactions for a repeated pattern or a change in contract behaviour. FISD keeps the recommendation tied to an inspectable Blockscout record.',pair:'Pattern comparison'}}
+
+/* FISD XC Decision Board: moves are previews for operator review, not autonomous on-chain actions. */
+let selectedMove='recommended';
+let reviewedItems=(()=>{try{return JSON.parse(localStorage.getItem('fisdReviewedItems')||'[]')}catch(_){return []}})();
+function selectedReviewKey(tx){return `${currentChain}:${hashValue(tx)||('manual-'+(tx._note?.id||'local'))}`}
+function renderVerification(){
+ const state=$('verifyState'),title=$('verifyTitle'),copy=$('verifyCopy'),button=$('markReviewedBtn');
+ const tx=selectedTx!==null?txs[selectedTx]:null;
+ if(!tx){state.textContent='WAITING FOR EVIDENCE';title.textContent='Select a signal to begin verification.';copy.textContent='Choose a timeline node or transaction row. FISD will show the exact source record and distinguish observed data from simulation or local notes.';if(button){button.disabled=true;button.textContent='Mark reviewed'}return;}
+ const key=selectedReviewKey(tx), reviewed=reviewedItems.includes(key);
+ let stateText, titleText, copyText;
+ if(tx._manual){stateText='LOCAL OPERATOR NOTE';titleText=reviewed?'Operator review recorded.':'This is an annotation, not chain evidence.';copyText='Manual notes are stored in this browser and are not a blockchain observation. Open the associated source event before treating it as verified.';}
+ else if(mode!=='live'){stateText='SIMULATED RECORD';titleText=reviewed?'Demo item reviewed locally.':'Demonstration data — not an actual transaction.';copyText='The record is simulated for UI evaluation. A local review marker demonstrates the workflow only; it does not verify an on-chain outcome.';}
+ else if(isFailure(tx)){stateText='ON-CHAIN FAILURE';titleText=reviewed?'Operator review recorded.':'Review the failure before repeating the action.';copyText='Blockscout reports a failed or reverted transaction. Inspect the receipt and contract context. Marking reviewed records an operator action; it does not change the transaction state.';}
+ else {stateText='OBSERVED IN BLOCKSCOUT';titleText=reviewed?'Operator review recorded.':'Source evidence is available for inspection.';copyText='The transaction was returned by Blockscout. Open the Explorer record to verify details, then mark your review. This UI marker is local and is not an on-chain attestation.';}
+ state.textContent=stateText;title.textContent=titleText;copy.textContent=copyText;
+ if(button){button.disabled=false;button.textContent=reviewed?'Reviewed locally ✓':'Mark reviewed';button.classList.toggle('reviewed',reviewed)}
+}
+function moveDefinitions(){
+ const tx=selectedTx!==null?txs[selectedTx]:null;
+ if(!tx)return [
+  {id:'recommended',number:'01',badge:'RECOMMENDED',title:'Connect a source',copy:'Load a wallet or contract to let FISD interpret observed activity.',effect:'A selected event anchors the decision path.',cta:'Go to source',kind:'recommended'},
+  {id:'compare',number:'02',badge:'ALTERNATIVE',title:'Compare adjacent activity',copy:'Review neighbouring events once a current position is available.',effect:'Spot recurrence or a change in behaviour.',cta:'Inspect timeline',kind:'alternative'},
+  {id:'monitor',number:'03',badge:'FOLLOW-UP',title:'Monitor for change',copy:'Live monitoring becomes available after a successful live connection.',effect:'A later sample can update the current position.',cta:'Monitoring options',kind:'alternative'}
+ ];
+ const rec=recommendation(tx,scoreTx(tx,txs));
+ let effect='Confirm the transaction context and record the operator review.';
+ if(isFailure(tx)) effect='Understand the revert reason before considering a retry.';
+ else if(transactionDirection(tx)==='OUT'&&transactionNative(tx)>0.1) effect='Confirm destination, purpose, and any associated token movement.';
+ else if(transactionDirection(tx)==='IN') effect='Match the incoming value to the expected source or operational event.';
+ else if(tx.to?.is_contract||/swap|approve|deposit|withdraw|execute|mint|burn|stake/i.test(String(methodName(tx)))) effect='Confirm the method, destination contract, and decoded interaction.';
+ return [
+  {id:'recommended',number:'01',badge:'RECOMMENDED',title:rec.title,copy:rec.copy,effect,cta:'Inspect evidence',kind:'recommended'},
+  {id:'compare',number:'02',badge:'ALTERNATIVE',title:isFailure(tx)?'Compare the failed call with its neighbours':'Compare neighbouring activity',copy:'Inspect the event before or after this one. Look for repeated calls, changing values, or a sequence that explains the selected signal.',effect:'Add context without changing the source record.',cta:'Compare events',kind:'alternative'},
+  {id:'monitor',number:'03',badge:'FOLLOW-UP',title:mode==='live'?'Monitor for the next event':'Prepare a live follow-up',copy:mode==='live'?'Watch for new activity on this source. Monitoring refreshes the sampled view every 60 seconds.':'A live connection is required before the dashboard can poll observed chain activity.',effect:'A future sample can confirm whether the activity changes.',cta:mode==='live'?'Start monitor':'What is required?',kind:'alternative'}
+ ];
+}
+function renderMoveBoard(){
+ const box=$('moveBoardCards');if(!box)return;
+ const moves=moveDefinitions();
+ if(!moves.some(m=>m.id===selectedMove))selectedMove='recommended';
+ box.innerHTML=moves.map(m=>`<article class="move-card ${m.kind} ${selectedMove===m.id?'chosen':''}" data-move-card="${m.id}" tabindex="0" role="group" aria-label="${esc(m.badge)} move option" aria-current="${selectedMove===m.id?'true':'false'}">
+  <div class="move-card-top"><span class="move-number">${m.number}</span><span class="move-badge">${m.badge}</span></div>
+  <h3>${esc(m.title)}</h3><p>${esc(m.copy)}</p>
+  <div class="move-effect"><span>EXPECTED EFFECT</span><b>${esc(m.effect)}</b></div>
+  <button type="button" class="move-action ${m.kind==='recommended'?'primary':''}" data-move-run="${m.id}">${esc(m.cta)} <span aria-hidden="true">↗</span></button>
+ </article>`).join('');
+ const chosen=moves.find(m=>m.id===selectedMove)||moves[0];
+ $('movePreviewTitle').textContent=chosen.title;
+ $('movePreviewCopy').textContent=chosen.effect;
+ $('movePreviewState').textContent=chosen.badge;
+ box.querySelectorAll('[data-move-card]').forEach(card=>{
+  const choose=()=>{selectedMove=card.dataset.moveCard;renderMoveBoard()};
+  card.addEventListener('click',e=>{if(e.target.closest('[data-move-run]'))return;choose()});
+  card.addEventListener('keydown',e=>{if(e.target!==card)return;if(e.key==='Enter'||e.key===' '){e.preventDefault();choose()}});
+ });
+ box.querySelectorAll('[data-move-run]').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();runMove(btn.dataset.moveRun)}));
+}
+function runMove(id){
+ selectedMove=id;renderMoveBoard();
+ if(id==='recommended'){
+  $('verifyOutcome').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+  showToast('Evidence panel focused. Inspect the Explorer record before recording a review.');
+ } else if(id==='compare'){
+  if(txs.length<2){showToast('Another transaction is needed to compare neighbouring activity.');return;}
+  const neighbour=selectedTx>0?selectedTx-1:Math.min(1,txs.length-1);
+  selectTx(neighbour);$('verifyOutcome').scrollIntoView({behavior:'smooth',block:'start'});
+  showToast('Selected an adjacent transaction for comparison. The original record remains unchanged.');
+ } else if(id==='monitor'){
+  if(mode==='live'){if(pollOn)stopMonitor();else startMonitor();showToast(pollOn?'Monitoring started.':'Monitoring paused.');}
+  else {showToast('Connect live first. Demo mode does not poll the blockchain.');$('sourceConnect').scrollIntoView({behavior:'smooth',block:'center'});}
+ }
+}
+function markSelectedReviewed(){
+ const tx=selectedTx!==null?txs[selectedTx]:null;if(!tx)return;
+ const key=selectedReviewKey(tx);
+ if(reviewedItems.includes(key))reviewedItems=reviewedItems.filter(k=>k!==key);else reviewedItems.push(key);
+ try{localStorage.setItem('fisdReviewedItems',JSON.stringify(reviewedItems))}catch(_){}
+ renderVerification();
+ showToast('Local operator review updated. This is not an on-chain attestation.');
+}
+
+function makeDemo(){const now=Date.now();const names=['Transfer','approve','swapExactTokensForTokens','Transfer','deposit','execute','Transfer','withdraw','swap','Transfer','transferOwnership','Transfer'];const vals=[0.12,0,1.84,0.015,0.8,0,0.025,0.44,2.6,0.04,0,0.31];const to=['0x8a12f3b21c009a135b6e0d09b4e12a7c8f33a201','0x5b7e8a11d6c4509a3b7d2e19c440a1f5c0a2bcde','0x7a250d5630b4cf539739df2c5dacab4c659f2488','0x4be2f6d3a2c1b7f6d5e4c3b2a190887766554433','0x3d4e5f60718293a4b5c6d7e8f90123456789abcd','0x9e8d7c6b5a4938271615141312111000ffeeddcc','0x1b2c3d4e5f60718293a4b5c6d7e8f90123456789','0x0aa0bb1cc2dd3ee4ff556677889900aabbccdde0','0xdef1c0ded9bec7f1a1670819833240f027b25eff','0x887766554433221100ffeeddccbbaa9988776655','0x7f1a9d3c5e7b2a40618293a4b5c6d7e8f901234','0x23456789abcdef0123456789abcdef0123456789'];return names.map((name,i)=>({hash:'0x'+(String(i+1).padStart(2,'0')+'abcdef1234567890').repeat(4).slice(0,64),timestamp:new Date(now-(i*1.65+Math.random()*.5)*3600000).toISOString(),block_number:21900000-i*37,from:{hash:i%3===0?to[i]:DEMO_ADDRESS,name:'Tracked account'},to:{hash:to[i],is_contract:/swap|approve|deposit|execute|withdraw|ownership/i.test(name)},value:String(BigInt(Math.round(vals[i]*1e6))*1000000000000n),method:name,status:i===5?'error':'ok',success:i!==5,_native:vals[i],_demo:true})).map((t,i)=>({...t,hash:'0x'+(i.toString(16).padStart(2,'0')+'a1b2c3d4e5f67890').repeat(4).slice(0,64)}))}
+function toTxModel(raw){return {...raw,_native:weiToNative(raw.value),_demo:false}}
+function setMode(m){mode=m;$('providerState').textContent=m==='live'?'BLOCKSCOUT PRO · LIVE':'DEMO DATA';$('providerDot').className='dot '+(m==='live'?'good':'warn');$('connectionMode').textContent=m==='live'?'LIVE · BLOCKSCOUT PRO':'SIMULATION';$('connectionMode').style.color=m==='live'?'var(--green)':'var(--amber)';$('chartSource').textContent=m==='live'?'BLOCKSCOUT PRO API · onchain evidence':'DEMO / simulated transaction evidence';$('explorerStatus').textContent=m==='live'?'Explorer links active':'Demo links';$('refreshStatus').textContent=pollOn?'60-second poll':'Manual'}
+function showToast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(showToast.t);showToast.t=setTimeout(()=>t.classList.remove('show'),4200)}
+function openModal(title,html,eyebrow='FISD XC / MODEL NOTE'){$('modalTitle').textContent=title;$('modalEyebrow').textContent=eyebrow;$('modalBody').innerHTML=html;$('modal').classList.add('open')}
+function baseTime(tx){const n=new Date(timeValue(tx)).getTime();return Number.isFinite(n)?n:Date.now()}
+function renderChart(){const s=$('chart');const W=960,H=590,top=36,fieldBottom=218,connectorTop=220,axisY=545;const startIndex=Math.max(0,txs.length-10);const list=txs.slice(startIndex);let html='';html+=`<text x="18" y="20" class="label">IMPACT FIELD · ACTIVITY SIGNAL INDEX</text><line x1="18" y1="230" x2="942" y2="230" class="axis"/><text x="18" y="250" class="label">CONNECTORS · SOURCE EVIDENCE TO CONSEQUENCE</text><text x="18" y="420" class="label">TIME SCALE · RECENT TRANSACTION SEQUENCE</text>`;
+ if(!list.length){s.innerHTML=html+`<text x="480" y="300" class="label" text-anchor="middle">No transactions to plot.</text>`;return}
+ const times=list.map(baseTime),min=Math.min(...times),max=Math.max(...times);const xAt=(t,i)=>max===min?80+(i/(Math.max(1,list.length-1)))*800:80+((t-min)/(max-min))*800;
+ html+=`<line x1="80" y1="${top+16}" x2="880" y2="${top+16}" class="axis"/>`;
+ const pts=list.map((tx,k)=>{const i=startIndex+k;const score=scoreTx(tx,txs);const t=baseTime(tx);const x=xAt(t,k);const y=fieldBottom-score*1.27;const r=8+score*.22;return {tx,i,visualIndex:k,score,x,y,r,t}});
+ // Sequential radial links, no shared binding point.
+ for(let i=0;i<pts.length-1;i++){const a=pts[i],b=pts[i+1];html+=`<path d="M ${a.x} ${a.y+8} C ${a.x} ${a.y+60}, ${b.x} ${b.y-50}, ${b.x} ${b.y}" class="line ${selectedTx===a.i||selectedTx===b.i?'focus':''}" data-index="${a.i}"/>`}
+ // Radius/node layer.
+ pts.forEach(p=>{const selected=selectedTx===p.i;html+=`<circle cx="${p.x}" cy="${p.y}" r="${p.r+9}" class="axis" stroke-dasharray="2 5" opacity=".45"/><circle cx="${p.x}" cy="${p.y}" r="${p.r}" class="node ${selected?'selected':''}" data-index="${p.i}" tabindex="0" role="button" aria-label="Inspect ${esc(methodName(p.tx))}"/><text x="${p.x}" y="${p.y+3.5}" class="node-value" data-index="${p.i}">${p.score}</text>`;});
+ html+=`<line x1="48" y1="${axisY}" x2="920" y2="${axisY}" class="axis"/>`;
+ const dateLabels=max===min?[min]:[min+(max-min)*.25,min+(max-min)*.5,min+(max-min)*.75,max];dateLabels.forEach(t=>{const x=80+((t-min)/(max-min||1))*800;html+=`<line x1="${x}" y1="${axisY-5}" x2="${x}" y2="${axisY+5}" class="axis"/><text x="${x}" y="${axisY+21}" text-anchor="middle" class="label">${new Date(t).toLocaleDateString([], {month:'short',day:'numeric'})}</text>`});
+ // transaction stems + score bars in the time-scale band
+ pts.forEach(p=>{const rowY=284+(p.visualIndex*23);const endX=clamp(p.x+Math.max(22,p.score*1.8),p.x+8,920);const faded=selectedTx!==null&&selectedTx!==p.i?'dim':'';html+=`<path d="M ${p.x} ${p.y+p.r} C ${p.x} ${p.y+35}, ${p.x} ${rowY-18}, ${p.x} ${rowY}" class="line ${faded}" data-index="${p.i}"/><line x1="${p.x}" y1="${rowY-10}" x2="${p.x}" y2="${rowY+10}" class="event-stem ${faded}" data-index="${p.i}"/><rect x="${p.x-3}" y="${rowY-3}" width="6" height="6" rx="3" class="event-mark ${faded}" data-index="${p.i}" tabindex="0"/><rect x="${p.x+7}" y="${rowY-3}" width="${Math.max(9,p.score*1.5)}" height="6" rx="3" class="bar ${faded}" data-index="${p.i}"/><text x="${clamp(p.x+10,25,820)}" y="${rowY-7}" class="label ${faded}" data-index="${p.i}">${esc(short(methodName(p.tx),12))}</text>`;});
+ html+=`<text x="48" y="581" class="label">${modesLabel()} · SELECT A NODE OR ROW TO TRACE ITS EVIDENCE</text>`;s.innerHTML=html;
+ s.querySelectorAll('[data-index]').forEach(n=>{const i=Number(n.dataset.index);n.addEventListener('mouseenter',()=>{n.style.opacity='1';});n.addEventListener('click',()=>selectTx(i));n.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectTx(i)}})});
+}
+function modesLabel(){return mode==='live'?'LIVE ONCHAIN DATA':'SIMULATED DATA'}
+function renderRows(){const body=$('txRows');if(!txs.length){body.innerHTML='<tr><td colspan="7" class="empty-row">No indexed transactions returned for this address.</td></tr>';return}body.innerHTML=txs.map((tx,i)=>({tx,i})).reverse().slice(0,30).map(({tx,i})=>{const dir=tx._manual?'NOTE':transactionDirection(tx),sc=scoreTx(tx,txs),failed=isFailure(tx),val=transactionNative(tx),hash=hashValue(tx);const status=tx._manual?'LOCAL NOTE':failed?'FAILED':mode==='live'?'OBSERVED':'SIMULATED';const evidence=tx._manual?'<span class="tag">LOCAL NOTE</span>':`<a href="${esc(explorerUrl(tx))}" target="_blank" rel="noopener" data-explorer>Open ↗</a>`;return `<tr data-row="${i}" class="${selectedTx===i?'selected':''}"><td>${esc(fmtDate(timeValue(tx)))}</td><td><span class="direction">${dir}</span> <span style="color:var(--muted)">${esc(short(methodName(tx),10))}</span></td><td class="hash">${esc(short(hash,7))}</td><td>${tx._manual?'—':nativeString(val)+' '+(CHAIN[currentChain]?.symbol||'native')}</td><td class="score">${sc}/100</td><td class="status ${failed?'error':tx._manual?'':mode==='live'?'success':'warning'}">${status}</td><td>${evidence}</td></tr>`}).join('');body.querySelectorAll('[data-row]').forEach(row=>row.addEventListener('click',e=>{if(e.target.closest('a'))return;selectTx(Number(row.dataset.row))}))}
+function selectTx(i){if(i<0||i>=txs.length)return;selectedTx=i;const tx=txs[i],sc=scoreTx(tx,txs),rec=recommendation(tx,sc),hash=hashValue(tx);$('actionScore').textContent=sc+' / 100';$('actionType').textContent=rec.type;$('actionTitle').textContent=rec.title;$('actionCopy').textContent=rec.copy;$('actionEvidence').textContent=short(hash,6);$('actionPair').textContent=rec.pair;$('actionDot').className='dot '+(isFailure(tx)?'bad':sc>=65?'warn':'good');$('detail').innerHTML=`<div><div class="detail-label">Selected evidence</div><div class="detail-value">${esc(short(hash,9))}</div></div><div><div class="detail-label">From</div><div class="detail-value mono">${esc(short(senderHash(tx),6))}</div></div><div><div class="detail-label">To</div><div class="detail-value mono">${esc(short(receiverHash(tx),6))}</div></div><div><div class="detail-label">Block / time</div><div class="detail-value">${esc(tx.block_number||tx.block||'—')} · ${esc(fmtDate(timeValue(tx)))}</div></div><div>${tx._manual?'<span class="tag">LOCAL ANNOTATION</span>':`<a class="btn" href="${esc(explorerUrl(tx))}" target="_blank" rel="noopener">Open in Blockscout ↗</a>`}</div><div class="detail-note">${tx._manual?'Manual FISD note stored locally; it is not onchain evidence.':mode==='live'?'Observed from Blockscout Pro API.':'Simulated demo record; not a real transaction.'} FISD score ${sc}/100 is derived from recency, native-value magnitude, interaction type and observed outcome. ${tx.to?.is_contract?'Destination is identified as a contract by the API.':''}</div>`;renderChart();renderRows();renderScoreBreakdown();selectedMove='recommended';renderMoveBoard();renderVerification();}
+function renderAll(){renderChart();renderRows();$('metricSource').textContent=short(currentAddress,7);$('metricChain').textContent=(CHAIN[currentChain]?.name||currentChain)+(mode==='demo'?' · simulated':' · Blockscout Pro');$('metricTx').textContent=txs.length;$('metricTxFoot').textContent=mode==='live'?'indexed transaction sample':'simulated sample · clearly labelled';$('apiEndpoint').textContent=mode==='live'?`/${currentChain}/api/v2/addresses/...`:'demo fixture';$('addressBalance').textContent=mode==='live'?(accountData?.coin_balance_formatted||accountData?.coin_balance||'Unavailable')+' '+(CHAIN[currentChain]?.symbol||'native'):'— · simulation';if(!txs.length){selectedTx=null;$('metricScore').textContent='—';$('metricValue').textContent='0 '+(CHAIN[currentChain]?.symbol||'native');$('metricValueFoot').textContent='No transactions in the returned sample';$('actionScore').textContent='— / 100';$('actionType').textContent='NO INDEXED ACTIVITY';$('actionTitle').textContent='No transaction to inspect yet.';$('actionCopy').textContent='The address endpoint responded, but no transaction items were returned. Try another address or check the selected chain.';$('actionEvidence').textContent='—';$('actionPair').textContent='—';$('detail').innerHTML='<div class="detail-note">No transaction was returned for this address on the selected chain. Address metadata may still be available from Blockscout.</div>';renderScoreBreakdown();renderMoveBoard();renderVerification();return;}const avg=Math.round(txs.reduce((a,tx)=>a+scoreTx(tx,txs),0)/txs.length);const sum=txs.reduce((a,tx)=>a+transactionNative(tx),0);$('metricScore').textContent=avg;$('metricValue').textContent=nativeString(sum)+' '+(CHAIN[currentChain]?.symbol||'native');$('metricValueFoot').textContent=mode==='live'?'sum of sampled native value · excludes tokens':'simulated native value · not USD';if(selectedTx!==null&&selectedTx<txs.length)selectTx(selectedTx);else selectTx(txs.length-1);}
+async function connectLive(){if(STATIC_PREVIEW){showToast('This is the static demo preview. Use the full API host to connect live data.');return}const address=$('address').value.trim();const chain=$('chain').value;if(!/^0x[a-fA-F0-9]{40}$/.test(address)){showToast('Enter a valid 0x address (40 hexadecimal characters).');$('address').focus();return}setBusy(true);$('connectionMessage').textContent='Querying Blockscout Pro API…';try{const res=await fetch(`/api/monitor?chainId=${encodeURIComponent(chain)}&address=${encodeURIComponent(address)}`,{headers:{Accept:'application/json'}});const data=await res.json().catch(()=>({}));if(!res.ok){throw new Error(data.error||`Request failed (${res.status})`)}if(!Array.isArray(data.transactions))throw new Error('The API response did not include a transaction list.');currentAddress=address;currentChain=chain;accountData=data.account||null;tokenTransferData=data.tokenTransfers||[];txs=data.transactions.map(toTxModel).sort((a,b)=>baseTime(a)-baseTime(b));attachLocalNotes();mode='live';selectedTx=txs.length?txs.length-1:null;lastUpdated=new Date();setMode('live');$('connectionMessage').textContent=`Connected · ${data.account?.name||short(address,8)} · ${data.transactions.length} transactions loaded.`;$('lastUpdated').textContent='Last fetched '+lastUpdated.toLocaleTimeString();$('explorerStatus').innerHTML=`<a href="${esc(getExplorer())}" target="_blank" rel="noopener">${esc(CHAIN[chain]?.name||chain)} Explorer ↗</a>`;$('address').value=address;$('providerNote').textContent=`Live data retrieved from Blockscout Pro REST v2. ${tokenTransferData.length} token-transfer records are available in this response.`;renderAll();showToast('Blockscout source connected. Evidence is live.');}catch(err){$('connectionMessage').textContent=err.message+' · Demo data remains available.';$('connectionMessage').className='error';showToast(err.message);if(!txs.length)loadDemo()}finally{setBusy(false)}}
+function setBusy(v){$('connectBtn').disabled=v;$('connectBtn').textContent=v?'Connecting…':'Connect live'}
+function loadDemo(){stopMonitor();currentChain=$('chain').value||'1';currentAddress=DEMO_ADDRESS;accountData=null;tokenTransferData=[];txs=makeDemo().sort((a,b)=>baseTime(a)-baseTime(b));attachLocalNotes();mode='demo';selectedTx=txs.length?txs.length-1:null;setMode('demo');$('address').value='';$('connectionMessage').className='';$('connectionMessage').textContent=STATIC_PREVIEW?'Static preview loaded. These are simulated records; live connection is intentionally disabled.':!health.available?'Standalone preview loaded with simulated records. Run the full-stack host to connect live data.':!health.configured?'Simulation loaded. The API server is reachable, but BLOCKSCOUT_PRO_API_KEY is not configured.':'Simulation loaded. These are invented sample records, not real chain activity.';$('lastUpdated').textContent=(STATIC_PREVIEW?'Static demo fixture · ':'Demo fixture · ')+new Date().toLocaleTimeString();$('providerNote').textContent=STATIC_PREVIEW?'This static GitHub Pages build is simulation-only. Use the full-stack host for Blockscout Pro API access.':!health.available?'The API server is not detected. Live requests require the full-stack host.':!health.configured?'Set BLOCKSCOUT_PRO_API_KEY in the server environment. The key is never returned to the browser.':'Demo mode uses simulated data. Connect a server-side Blockscout Pro API key to switch to observed transactions.';renderAll();showToast('Demo dataset loaded — clearly marked as simulation.')}
+async function checkHealth(){if(STATIC_PREVIEW){health={configured:false,available:false,static:true};$('connectBtn').disabled=true;$('connectBtn').title='Live data requires the full-stack API host';$('connectionMessage').textContent='Static preview · simulation only. Live connection is available on the full-stack API host.';$('providerNote').textContent='GitHub Pages serves this simulation build only; no API key is stored in the browser.';return}try{const r=await fetch('/api/health');health=await r.json();health.available=true;$('connectBtn').disabled=!health.configured;$('connectBtn').title=health.configured?'Connect to Blockscout Pro API':'Configure BLOCKSCOUT_PRO_API_KEY on the server to enable live data';if(!health.configured){$('connectionMessage').textContent='Server is running, but BLOCKSCOUT_PRO_API_KEY is not configured. Demo mode is available.';$('providerNote').textContent='Set BLOCKSCOUT_PRO_API_KEY in your hosting environment. The API key is never returned to the browser.'}}catch{health={configured:false,available:false};$('connectBtn').disabled=true;$('connectBtn').title='Run the full-stack server to connect live data';$('connectionMessage').textContent='Standalone preview mode. For live data, run the included Node server with a Blockscout Pro key.';$('providerNote').textContent='The HTML is in simulation mode; actual API access is mediated by server.js so the key is not exposed in the browser.'}}
+async function refreshCurrent(){if(mode!=='live'){showToast('Connect a live address before refreshing.');return}await connectLive()}
+function startMonitor(){if(mode!=='live'){showToast('Connect a live address first.');return}stopMonitor();pollOn=true;$('monitorBtn').textContent='Pause monitor';$('refreshStatus').textContent='60-second poll';pollTimer=setInterval(()=>{if(!document.hidden)refreshCurrent()},60000);showToast('Monitoring active. Refreshing every 60 seconds.');}
+function stopMonitor(){if(pollTimer)clearInterval(pollTimer);pollTimer=null;pollOn=false;if($('monitorBtn'))$('monitorBtn').textContent='Start monitor';if($('refreshStatus'))$('refreshStatus').textContent='Manual'}
+function nextActionForNotes(note){if(note.type==='risk')return 'Inspect evidence';if(note.type==='decision')return 'Commit next step';if(note.type==='milestone')return 'Verify outcome';if(note.type==='signal')return 'Review pattern';return 'Link to observed event'}
+function attachLocalNotes(){const relevant=notes.filter(n=>n.chain===currentChain&&n.address===currentAddress);const known=new Set(txs.filter(t=>t._manual).map(t=>t.hash));relevant.forEach(n=>{const hash='MANUAL-'+n.id;if(!known.has(hash))txs.push({hash,timestamp:n.createdAt,block_number:'LOCAL',from:{hash:currentAddress},to:{hash:'FISD NOTE'},value:'0',method:n.name,status:'manual',success:true,_native:0,_manual:true,_score:n.impact,_note:n})});txs.sort((a,b)=>baseTime(a)-baseTime(b))}
+function addNote(e){e.preventDefault();const name=$('noteName').value.trim();if(!name)return;const n={id:Date.now(),name,type:$('noteType').value,impact:+$('noteImpact').value,createdAt:new Date().toISOString(),address:currentAddress,chain:currentChain};notes.unshift(n);localStorage.setItem('fisdOpsNotes',JSON.stringify(notes));const hash='MANUAL-'+n.id;txs.push({hash,timestamp:n.createdAt,block_number:'LOCAL',from:{hash:currentAddress},to:{hash:'FISD NOTE'},value:'0',method:n.name,status:'manual',success:true,_native:0,_manual:true,_score:n.impact,_note:n});txs.sort((a,b)=>baseTime(a)-baseTime(b));selectedTx=txs.findIndex(t=>t.hash===hash);setMode(mode);renderAll();showToast('Manual FISD note added. It is labelled separately from onchain evidence.');$('noteName').value=''}
+function runTrace(){openModal('How FISD turns chain data into action',`<p><strong>1 · Observe</strong> — The local server requests address details and transaction history from Blockscout Pro REST v2; token transfers are requested as supporting evidence.</p><p><strong>2 · Normalize</strong> — Transactions are sorted and mapped to direction, method, time, native value and result.</p><p><strong>3 · Score</strong> — A transparent heuristic combines recency, native-value magnitude, contract interaction and transaction outcome.</p><p><strong>4 · Relate</strong> — The impact field and timescale share transaction identity. Selecting a node highlights the corresponding evidence.</p><p><strong>5 · Recommend</strong> — Rules recommend review, reconciliation, recipient verification, or contract inspection. The recommendation is triage support, not an automated financial conclusion.</p><p><strong>6 · Verify</strong> — Every live transaction links to its Blockscout Explorer record.</p>`,'FISD MODEL TRACE')}
+function showMethod(){openModal('Signal score methodology',`<p>The score is an <strong>explainable triage index</strong>, not a prediction of monetary value or malicious activity.</p><ol><li><strong>Recency (0–28):</strong> newer transactions receive more weight.</li><li><strong>Native value (0–26):</strong> log-scaled relative to the sampled activity window; token transfers are not added to native value.</li><li><strong>Interaction (5–17):</strong> contract or non-simple transfer methods receive additional weight.</li><li><strong>Outcome (15–19):</strong> failed/reverted records receive a different triage weight.</li><li><strong>Direction (5–8):</strong> outgoing or contract-call paths get slightly more attention.</li></ol><p>These weights are a starting heuristic to help an operator choose what to inspect. They must be calibrated and validated before use in production.</p>`,'MODEL TRANSPARENCY')}
+
+function setViewMode(view, persist=true){
+ const v=view==='complex'?'complex':'simple';
+ document.body.dataset.view=v;
+ const simple=$('simpleViewBtn'),complex=$('complexViewBtn');
+ if(simple){simple.classList.toggle('active',v==='simple');simple.setAttribute('aria-pressed',String(v==='simple'));}
+ if(complex){complex.classList.toggle('active',v==='complex');complex.setAttribute('aria-pressed',String(v==='complex'));}
+ const note=$('viewModeNote');
+ if(note){
+   note.innerHTML=v==='simple'
+    ? '<strong>SIMPLE VIEW</strong><span>Key signal, timeline and next action. Switch to Full workings to inspect model contributions, raw evidence and API provenance.</span>'
+    : '<strong>FULL WORKINGS</strong><span>Detailed score components, transaction evidence, provider/API status and operator annotations are visible.</span>';
+ }
+ if(persist){try{localStorage.setItem('fisdViewMode',v)}catch(_){}}
+ renderScoreBreakdown();
+}
+const STATIC_PREVIEW=document.documentElement.dataset.hostMode==='static';
+$('markReviewedBtn').addEventListener('click',markSelectedReviewed);$('primaryMoveBtn').addEventListener('click',()=>runMove('recommended'));
+$('simpleViewBtn').addEventListener('click',()=>setViewMode('simple'));
+$('complexViewBtn').addEventListener('click',()=>setViewMode('complex'));
+try{const savedView=localStorage.getItem('fisdViewMode');setViewMode(savedView==='complex'?'complex':'simple',false)}catch(_){setViewMode('simple',false)}
+
+$('connectBtn').addEventListener('click',connectLive);$('demoBtn').addEventListener('click',loadDemo);$('refreshBtn').addEventListener('click',refreshCurrent);$('monitorBtn').addEventListener('click',()=>pollOn?stopMonitor():startMonitor());$('traceBtn').addEventListener('click',runTrace);$('methodBtn').addEventListener('click',showMethod);$('modalClose').addEventListener('click',()=>$('modal').classList.remove('open'));$('modal').addEventListener('click',e=>{if(e.target===$('modal'))$('modal').classList.remove('open')});function setFisdTheme(theme){document.body.dataset.theme=theme;$('themeBtn').textContent=theme==='light'?'Dark mode':'Light mode';document.querySelector('meta[name=theme-color]').content=theme==='light'?'#F8F8F5':'#08090C';try{localStorage.setItem('fisdTheme',theme)}catch(_){}};try{const savedTheme=localStorage.getItem('fisdTheme');if(savedTheme==='light'||savedTheme==='dark')document.body.dataset.theme=savedTheme}catch(_){};setFisdTheme(document.body.dataset.theme||'dark');$('themeBtn').addEventListener('click',()=>setFisdTheme(document.body.dataset.theme==='light'?'dark':'light'));$('chain').addEventListener('change',()=>{currentChain=$('chain').value;if(mode==='demo'){txs=makeDemo().sort((a,b)=>baseTime(a)-baseTime(b));attachLocalNotes();selectedTx=txs.length?txs.length-1:null;renderAll()}});$('noteForm').addEventListener('submit',addNote);document.addEventListener('visibilitychange',()=>{if(document.hidden&&pollOn){} });
+
+const traceCopy=$('traceBtnDuplicate');if(traceCopy)traceCopy.addEventListener('click',runTrace);
+const methodCopy=$('methodBtnDuplicate');if(methodCopy)methodCopy.addEventListener('click',showMethod);
+const originalSetMode=setMode;
+setMode=function(m){originalSetMode(m);if($('refreshStatusComplex'))$('refreshStatusComplex').textContent=pollOn?'60-second poll':'Manual';if($('explorerStatusComplex'))$('explorerStatusComplex').textContent=m==='live'?'Live chain evidence':'Simulation links';};
+const originalStartMonitor=startMonitor;
+startMonitor=function(){originalStartMonitor();if($('refreshStatusComplex'))$('refreshStatusComplex').textContent=pollOn?'60-second poll':'Manual';};
+const originalStopMonitor=stopMonitor;
+stopMonitor=function(){originalStopMonitor();if($('refreshStatusComplex'))$('refreshStatusComplex').textContent='Manual';};
+
+
+/* Shared workspace: both FISD XC layouts use the same state, score model and API route. */
+const FISD_WORKSPACE_KEY='fisdXC:shared-workspace:v1';
+const FISD_POLL_LEASE_KEY='fisdXC:poll-lease:v1';
+const FISD_TAB_ID=(window.crypto&&window.crypto.randomUUID)?window.crypto.randomUUID():'tab-'+Date.now()+'-'+Math.random().toString(36).slice(2);
+const FISD_CHANNEL=('BroadcastChannel' in window)?new BroadcastChannel('fisdXC:shared-workspace:v1'):null;
+let fisdApplyingShared=false, fisdLastSignature='', fisdActiveCardKey='', fisdPollHeartbeat=null, fisdLongPressTimer=null, fisdLongPressTarget=null, fisdLongPressOrigin=null, fisdLongPressFired=false, fisdPressStart=null, fisdSuppressClickUntil=0, fisdLastAppliedAt=0, fisdLongPressOriginElement=null, fisdSuppressSelectionHaptic=false;
+let fisdInsight=document.getElementById('fisdInsight');
+if(!fisdInsight){fisdInsight=document.createElement('aside');fisdInsight.id='fisdInsight';fisdInsight.className='fisd-insight';fisdInsight.setAttribute('role','status');fisdInsight.setAttribute('aria-live','polite');document.body.appendChild(fisdInsight)}
+function fisdHaptic(kind='select'){
+ const supported=typeof navigator!=='undefined'&&typeof navigator.vibrate==='function';
+ if(supported){try{navigator.vibrate(kind==='long'?[12,22,12]:kind==='success'?[8,18,8]:7);return true}catch(_){}}
+ return false;
+}
+function fisdCurrentHash(){return selectedTx!==null&&txs[selectedTx]?hashValue(txs[selectedTx]):null}
+function fisdWorkspacePayload(){return {
+ version:1,mode,currentAddress,currentChain,txs,selectedHash:fisdCurrentHash(),accountData,tokenTransferData,
+ notes,reviewedItems,selectedMove,activeCardKey:fisdActiveCardKey,
+ view:document.body.dataset.view||'simple',theme:document.body.dataset.theme||'light',pollOn:!!pollOn,
+ lastUpdated:lastUpdated instanceof Date?lastUpdated.toISOString():(lastUpdated||null)
+}}
+function fisdSignature(payload){return JSON.stringify(payload)}
+function fisdPublishShared(force=false){
+ if(fisdApplyingShared)return;
+ try{
+  const payload=fisdWorkspacePayload(),signature=fisdSignature(payload);
+  if(!force&&signature===fisdLastSignature)return;
+  fisdLastSignature=signature;
+  const envelope={...payload,writer:FISD_TAB_ID,revision:Date.now()};
+  localStorage.setItem(FISD_WORKSPACE_KEY,JSON.stringify(envelope));
+  if(FISD_CHANNEL)FISD_CHANNEL.postMessage(envelope);
+ }catch(err){console.warn('FISD shared state could not be saved',err)}
+}
+function fisdReadShared(){try{const raw=localStorage.getItem(FISD_WORKSPACE_KEY);if(!raw)return null;const state=JSON.parse(raw);return state&&state.version===1&&Array.isArray(state.txs)?state:null}catch(_){return null}}
+function fisdSetMonitorLabel(){
+ const b=$('monitorBtn');if(b)b.textContent=pollOn?'Pause monitor':'Start monitor';
+ const r=$('refreshStatus');if(r)r.textContent=pollOn?'60-second shared poll':'Manual';
+ const c=$('refreshStatusComplex');if(c)c.textContent=pollOn?'60-second shared poll':'Manual';
+}
+function fisdLease(){try{return JSON.parse(localStorage.getItem(FISD_POLL_LEASE_KEY)||'null')}catch(_){return null}}
+function fisdClaimLease(){
+ if(!pollOn||mode!=='live')return false;
+ const now=Date.now(),lease=fisdLease();
+ if(lease&&lease.owner!==FISD_TAB_ID&&lease.expires>now)return false;
+ try{localStorage.setItem(FISD_POLL_LEASE_KEY,JSON.stringify({owner:FISD_TAB_ID,expires:now+28000}));const confirm=fisdLease();return !!confirm&&confirm.owner===FISD_TAB_ID}catch(_){return false}
+}
+function fisdRenewLease(){if(!pollOn||!pollTimer)return;const lease=fisdLease();if(lease&&lease.owner===FISD_TAB_ID){try{localStorage.setItem(FISD_POLL_LEASE_KEY,JSON.stringify({owner:FISD_TAB_ID,expires:Date.now()+28000}))}catch(_){}}}
+function fisdEnsurePollingLeader(){
+ if(!pollOn||mode!=='live'||pollTimer)return;
+ if(fisdClaimLease()){
+  pollTimer=setInterval(()=>{if(!document.hidden&&pollOn&&mode==='live')refreshCurrent()},60000);
+  fisdSetMonitorLabel();
+ }
+}
+function startMonitor(){
+ if(mode!=='live'){showToast('Connect a live address before starting shared monitoring.');return}
+ pollOn=true;fisdEnsurePollingLeader();
+ if(!fisdPollHeartbeat)fisdPollHeartbeat=setInterval(()=>{if(!pollOn){return}if(pollTimer)fisdRenewLease();else fisdEnsurePollingLeader()},8000);
+ fisdSetMonitorLabel();fisdPublishShared(true);
+ showToast(pollTimer?'Shared monitor active · refreshing every 60 seconds.':'Monitoring requested · another FISD tab may currently own the refresh cycle.');
+}
+function stopMonitor(){
+ if(pollTimer){clearInterval(pollTimer);pollTimer=null}
+ if(fisdPollHeartbeat){clearInterval(fisdPollHeartbeat);fisdPollHeartbeat=null}
+ const lease=fisdLease();if(lease&&lease.owner===FISD_TAB_ID){try{localStorage.removeItem(FISD_POLL_LEASE_KEY)}catch(_){}}
+ pollOn=false;fisdSetMonitorLabel();if(!fisdApplyingShared)fisdPublishShared(true);
+}
+function fisdApplyShared(state){
+ if(!state||state.writer===FISD_TAB_ID||Number(state.revision||0)<=fisdLastAppliedAt)return;
+ fisdLastAppliedAt=Number(state.revision||Date.now());fisdApplyingShared=true;
+ try{
+  const incomingPoll=!!state.pollOn;
+  if(!incomingPoll&&pollTimer){clearInterval(pollTimer);pollTimer=null;const lease=fisdLease();if(lease&&lease.owner===FISD_TAB_ID)localStorage.removeItem(FISD_POLL_LEASE_KEY)}
+  if(!incomingPoll&&fisdPollHeartbeat){clearInterval(fisdPollHeartbeat);fisdPollHeartbeat=null}
+  mode=state.mode==='live'?'live':'demo';currentAddress=state.currentAddress||DEMO_ADDRESS;currentChain=String(state.currentChain||'1');
+  txs=Array.isArray(state.txs)?state.txs:[];accountData=state.accountData||null;tokenTransferData=Array.isArray(state.tokenTransferData)?state.tokenTransferData:[];
+  notes=Array.isArray(state.notes)?state.notes:[];reviewedItems=Array.isArray(state.reviewedItems)?state.reviewedItems:[];
+  selectedMove=state.selectedMove||'recommended';fisdActiveCardKey=state.activeCardKey||'';pollOn=incomingPoll;
+  lastUpdated=state.lastUpdated?new Date(state.lastUpdated):null;
+  try{localStorage.setItem('fisdOpsNotes',JSON.stringify(notes));localStorage.setItem('fisdReviewedItems',JSON.stringify(reviewedItems));}catch(_){}
+  $('chain').value=currentChain;$('address').value=mode==='live'?currentAddress:'';
+  const initialWanted=state.selectedHash?txs.findIndex(t=>hashValue(t)===state.selectedHash):-1;selectedTx=initialWanted>=0?initialWanted:(txs.length?txs.length-1:null);
+  setMode(mode);if(state.view)setViewMode(state.view,false);if(state.theme)setFisdTheme(state.theme);
+  renderAll();
+  const wanted=state.selectedHash?txs.findIndex(t=>hashValue(t)===state.selectedHash):-1;
+  if(wanted>=0&&wanted!==selectedTx)selectTx(wanted);else if(wanted<0&&state.selectedHash===null&&txs.length===0)selectedTx=null;
+  selectedMove=state.selectedMove||'recommended';renderMoveBoard();renderVerification();renderScoreBreakdown();
+  if(mode==='live')$('connectionMessage').textContent='Shared workspace restored · refresh to retrieve the latest on-chain data.';
+  else $('connectionMessage').textContent='Shared simulation snapshot · records are illustrative, not real blockchain data.';
+  if(lastUpdated)$('lastUpdated').textContent='Last fetched '+lastUpdated.toLocaleTimeString();
+  fisdSetMonitorLabel();fisdHighlightSelected();
+  if(pollOn){if(!fisdPollHeartbeat)fisdPollHeartbeat=setInterval(()=>{if(pollOn){if(pollTimer)fisdRenewLease();else fisdEnsurePollingLeader()}},8000);setTimeout(fisdEnsurePollingLeader,150)}
+ }catch(err){console.warn('Unable to apply shared FISD workspace',err)}
+ finally{fisdApplyingShared=false;fisdLastSignature=fisdSignature(fisdWorkspacePayload())}
+}
+function fisdRestoreShared(){const state=fisdReadShared();if(!state)return false;fisdLastAppliedAt=Number(state.revision||0);fisdApplyShared({...state,writer:'remote-restore',revision:Math.max(Number(state.revision||0),Date.now())});fisdLastAppliedAt=Number(state.revision||0);return true}
+function fisdHighlightSelected(){
+ document.querySelectorAll('.metric').forEach(n=>{n.tabIndex=0;n.setAttribute('role','button');const label=n.querySelector('.metric-label')?.textContent||'metric';n.setAttribute('aria-label',label+' · select to explain function')});
+ document.querySelectorAll('tr[data-row]').forEach(n=>{n.tabIndex=0;n.setAttribute('aria-label','Inspect transaction '+(n.cells?.[1]?.textContent||''))});
+ document.querySelectorAll('.chart [data-index]').forEach(n=>{if(!n.hasAttribute('tabindex'))n.setAttribute('tabindex','0')});
+ document.querySelectorAll('.fisd-selected-card').forEach(n=>n.classList.remove('fisd-selected-card'));
+ if(fisdActiveCardKey){const item=document.getElementById(fisdActiveCardKey);const card=item?.closest('.metric')||item;if(card)card.classList.add('fisd-selected-card')}
+ const selected=selectedTx!==null?txs[selectedTx]:null;
+ document.querySelectorAll('[data-row]').forEach(n=>n.classList.toggle('selected',Number(n.dataset.row)===selectedTx));
+ document.querySelectorAll('.chart [data-index]').forEach(n=>{const idx=Number(n.dataset.index);if(n.classList.contains('node'))n.classList.toggle('selected',idx===selectedTx);});
+ if(selected){document.querySelectorAll('[data-move-card]').forEach(n=>n.classList.toggle('chosen',n.dataset.moveCard===selectedMove))}
+}
+function fisdMetricDescription(metric){
+ const descriptions={metricSource:['Current position','The wallet or contract supplying the selected transaction sample.','Next pair: inspect the timeline and verify the selected source in Blockscout.'],metricTx:['Observed sample','The number of transaction records currently loaded for this source. It is a sample, not necessarily the complete wallet history.','Next pair: inspect the highest-scoring event and its source record.'],metricScore:['Average triage signal','The average of the current sample’s rule-based scores. It prioritises inspection; it is not a fraud probability or financial impact value.','Next pair: inspect the strongest individual signal and its score composition.'],metricValue:['Native value sampled','The sum of native-asset values in the loaded transaction sample. It is not USD and excludes token-transfer value.','Next pair: reconcile transaction-level movements and token-transfer evidence.']};return descriptions[metric]||['FISD XC item','A component of the current operational view.','Next pair: inspect supporting evidence.']
+}
+function fisdExplainData(target){
+ if(!target)return null;
+ const row=target.closest('[data-row]'), node=target.closest('.chart [data-index]');
+ if(row||node){const idx=Number((row||node).dataset[row?'row':'index']);const tx=txs[idx];if(!tx)return null;const score=scoreTx(tx,txs),rec=recommendation(tx,score);return {title:methodName(tx)||'Transaction',copy:rec.copy,pair:rec.pair||'Inspect source evidence',reason:`${score}/100 triage score · ${mode==='live'?'Blockscout-observed record':'simulated record'}${isFailure(tx)?' · failed/reverted result':''}`}}
+ const move=target.closest('[data-move-card]');if(move){const def=moveDefinitions().find(m=>m.id===move.dataset.moveCard);if(!def)return null;const moves=moveDefinitions(),pair=moves.find(m=>m.id!==def.id&&m.id==='recommended')||moves.find(m=>m.id!==def.id);return {title:def.title,copy:def.copy,pair:pair?pair.title:'Verify outcome',reason:`Expected effect: ${def.effect}`}}
+ const metric=target.closest('.metric');if(metric){const id=metric.querySelector('[id]')?.id;const d=fisdMetricDescription(id);return {title:d[0],copy:d[1],pair:d[2].replace('Next pair: ','') ,reason:'Derived from the same shared FISD workspace.'}}
+ const verify=target.closest('#verifyOutcome');if(verify)return {title:'Verify outcome',copy:$('verifyCopy').textContent,pair:'Review the original Blockscout Explorer record',reason:'Operator verification is local; it is not an on-chain attestation.'};
+ return null;
+}
+function fisdShowInsight(target,event){const d=fisdExplainData(target);if(!d)return;fisdInsight.innerHTML=`<div class="fisd-insight-kicker">FISD FUNCTION</div><div class="fisd-insight-title">${esc(d.title)}</div><div class="fisd-insight-copy">${esc(d.copy)}</div><div class="fisd-insight-pair"><b>NEXT BEST PAIRED FUNCTION</b><span>${esc(d.pair)}</span><small>${esc(d.reason)}</small></div>`;fisdInsight.classList.add('visible');fisdPositionInsight(event);}
+function fisdPositionInsight(e){if(!e||!fisdInsight.classList.contains('visible')||matchMedia('(max-width:760px)').matches)return;const rect=fisdInsight.getBoundingClientRect(),pad=12;let x=(e.clientX||20)+15,y=(e.clientY||20)+15;if(x+rect.width>innerWidth-pad)x=(e.clientX||innerWidth-20)-rect.width-15;if(y+rect.height>innerHeight-pad)y=(e.clientY||innerHeight-20)-rect.height-15;fisdInsight.style.left=Math.max(pad,x)+'px';fisdInsight.style.top=Math.max(pad,y)+'px';}
+function fisdHideInsight(){fisdInsight.classList.remove('visible')}
+function fisdSetActiveMetric(metric){const id=metric.querySelector('[id]')?.id;if(!id)return;fisdActiveCardKey=id;fisdHighlightSelected();fisdHaptic('select');fisdPublishShared(true);}
+function fisdExplainModal(target){
+ const d=fisdExplainData(target);if(!d)return;
+ openModal('FISD FUNCTION · LONG-PRESS INSPECTION',`<h3>${esc(d.title)}</h3><p>${esc(d.copy)}</p><p><strong>Next best paired function</strong><br>${esc(d.pair)}</p><p>${esc(d.reason)}</p><p class="panel-sub">Selection is highlighted in this view and synchronised to the other FISD XC layout on this browser origin.</p>`,'SELECTION / PAIRED ACTION');
+}
+function fisdSelectable(target){return target?.closest('.metric,tr[data-row],.chart [data-index],[data-move-card],#verifyOutcome')||null}
+function fisdLongPressBegin(e){
+ if(e.pointerType==='mouse'&&e.button!==0)return;
+ const target=fisdSelectable(e.target);if(!target)return;
+ if(e.target.closest('a,button,input,select,textarea'))return;
+ fisdLongPressCancel();fisdLongPressTarget=target;fisdLongPressOrigin={x:e.clientX,y:e.clientY,pointerId:e.pointerId,pointerType:e.pointerType};fisdLongPressFired=false;target.classList.add('press-pending');
+ fisdLongPressTimer=setTimeout(()=>{
+  fisdLongPressFired=true;fisdSuppressClickUntil=Date.now()+750;fisdLongPressOriginElement=target;setTimeout(()=>{if(Date.now()>=fisdSuppressClickUntil)fisdLongPressOriginElement=null},850);target.classList.remove('press-pending');target.classList.add('long-pressed');setTimeout(()=>target.classList.remove('long-pressed'),1000);
+  const touchHaptics=!!fisdLongPressOrigin&&(fisdLongPressOrigin.pointerType==='touch'||fisdLongPressOrigin.pointerType==='pen');const h=fisdHaptic('long');if(!h&&touchHaptics)showToast('Item selected · visual feedback is active; this browser does not expose vibration haptics.');
+  const row=target.closest('[data-row]'),node=target.closest('.chart [data-index]'),metric=target.closest('.metric'),move=target.closest('[data-move-card]');
+  if(row||node){const idx=Number((row||node).dataset[row?'row':'index']);if(idx>=0){fisdSuppressSelectionHaptic=true;selectTx(idx);fisdSuppressSelectionHaptic=false;}}
+  else if(move){selectedMove=move.dataset.moveCard;renderMoveBoard();fisdPublishShared(true)}
+  else if(metric){fisdSetActiveMetric(metric)}
+  fisdHighlightSelected();fisdExplainModal(target);
+ },470);
+}
+function fisdLongPressCancel(){if(fisdLongPressTimer)clearTimeout(fisdLongPressTimer);fisdLongPressTimer=null;if(fisdLongPressTarget)fisdLongPressTarget.classList.remove('press-pending');fisdLongPressTarget=null;fisdLongPressOrigin=null;}
+function fisdRenderEditorialMetrics(){
+ const scoreEl=$('editorialScore'),box=$('editorialMiniBars');if(!scoreEl||!box)return;
+ if(!txs.length){scoreEl.textContent='—';box.innerHTML='<div class="mini-score-row"><span>No sampled activity</span><i></i><b>—</b></div>';return}
+ const avg=Math.round(txs.reduce((sum,tx)=>sum+scoreTx(tx,txs),0)/txs.length);scoreEl.textContent=String(avg);
+ const labels=['Recency','Native value','Interaction type','Observed outcome','Direction'];
+ const contributions=labels.map(label=>{let total=0,max=0;txs.forEach(tx=>{const part=scoreParts(tx,txs).find(p=>p.label===label);if(part){total+=Number(part.value)||0;max=Number(part.max)||max}});return {label,avg:total/txs.length,max}});
+ box.innerHTML=contributions.map(p=>`<div class="mini-score-row"><span>${esc(p.label)}</span><i style="--bar-width:${p.max?clamp(p.avg/p.max*100,0,100):0}%"></i><b>${Math.round(p.avg)}/${p.max||'—'}</b></div>`).join('');
+}
+function fisdSignatureNow(){return fisdSignature(fisdWorkspacePayload())}
+function fisdInstallSharedBridge(){
+ const saved=fisdReadShared();if(saved)fisdLastSignature=fisdSignature({...saved,writer:undefined,revision:undefined});
+ if(FISD_CHANNEL)FISD_CHANNEL.addEventListener('message',e=>fisdApplyShared(e.data));
+ window.addEventListener('storage',e=>{if(e.key===FISD_WORKSPACE_KEY&&e.newValue){try{fisdApplyShared(JSON.parse(e.newValue))}catch(_){}}});
+ setInterval(()=>{fisdPublishShared(false);fisdSetMonitorLabel()},900);
+ window.addEventListener('pagehide',()=>{const lease=fisdLease();if(lease&&lease.owner===FISD_TAB_ID){try{localStorage.removeItem(FISD_POLL_LEASE_KEY)}catch(_){}}});
+ document.addEventListener('pointerover',e=>{if(e.pointerType==='touch')return;const target=fisdSelectable(e.target);if(!target)return;if(e.relatedTarget&&target.contains(e.relatedTarget))return;target.classList.add('fisd-pickable');fisdShowInsight(target,e)});
+ document.addEventListener('pointermove',e=>{if(fisdInsight.classList.contains('visible'))fisdPositionInsight(e);if(fisdLongPressOrigin&&e.pointerId===fisdLongPressOrigin.pointerId&&Math.hypot(e.clientX-fisdLongPressOrigin.x,e.clientY-fisdLongPressOrigin.y)>12)fisdLongPressCancel()});
+ document.addEventListener('pointerout',e=>{const target=fisdSelectable(e.target);if(target&&(!e.relatedTarget||!target.contains(e.relatedTarget))){target.classList.remove('fisd-pickable');if(!fisdLongPressFired)fisdHideInsight()}});
+ document.addEventListener('focusin',e=>{const target=fisdSelectable(e.target);if(target){target.classList.add('fisd-pickable');fisdShowInsight(target,{clientX:20,clientY:20})}});
+ document.addEventListener('focusout',e=>{const target=fisdSelectable(e.target);if(target){target.classList.remove('fisd-pickable');fisdHideInsight()}});
+ document.addEventListener('pointerdown',fisdLongPressBegin,{passive:true});
+ ['pointerup','pointercancel','pointerleave'].forEach(name=>document.addEventListener(name,()=>{if(fisdLongPressTimer)fisdLongPressCancel()} ,{passive:true}));
+ document.addEventListener('click',e=>{
+  if(fisdLongPressFired&&Date.now()<fisdSuppressClickUntil){e.preventDefault();e.stopImmediatePropagation();fisdLongPressFired=false;fisdLongPressOriginElement=null;fisdLongPressCancel();return}
+  const metric=e.target.closest?.('.metric');if(metric){fisdSetActiveMetric(metric);return}
+  const move=e.target.closest?.('[data-move-card]');if(move&&!e.target.closest('[data-move-run]')){fisdHaptic('select');setTimeout(()=>fisdPublishShared(true),0);}
+ },true);
+}
+const fisdOriginalSelectTx=selectTx;
+selectTx=function(i){const previous=selectedTx;if(!fisdApplyingShared)fisdActiveCardKey='';fisdOriginalSelectTx(i);if(!fisdApplyingShared&&!fisdSuppressSelectionHaptic&&selectedTx!==previous)fisdHaptic('select');fisdHighlightSelected();if(!fisdApplyingShared)fisdPublishShared(true)};
+const fisdOriginalSetViewMode=setViewMode;
+setViewMode=function(view,persist=true){fisdOriginalSetViewMode(view,persist);if(!fisdApplyingShared)fisdPublishShared(true)};
+const fisdOriginalSetTheme=setFisdTheme;
+setFisdTheme=function(theme){fisdOriginalSetTheme(theme);if(!fisdApplyingShared)fisdPublishShared(true)};
+const fisdOriginalRunMove=runMove;
+runMove=function(id){fisdOriginalRunMove(id);if(!fisdApplyingShared)fisdPublishShared(true)};
+/* Update the editorial readout whenever the underlying sample is recalculated. */
+const fisdOriginalRenderAll=renderAll;
+renderAll=function(){fisdOriginalRenderAll();fisdRenderEditorialMetrics();fisdHighlightSelected()};
+function fisdBootSharedWorkspace(){
+ fisdInstallSharedBridge();
+ (async()=>{
+  await checkHealth();
+  const restored=fisdRestoreShared();
+  if(!restored){loadDemo();fisdPublishShared(true)}
+  else {fisdRenderEditorialMetrics();fisdSetMonitorLabel();}
+  renderMoveBoard();renderVerification();fisdRenderEditorialMetrics();fisdHighlightSelected();
+  if(pollOn){if(!fisdPollHeartbeat)fisdPollHeartbeat=setInterval(()=>{if(pollOn){if(pollTimer)fisdRenewLease();else fisdEnsurePollingLeader()}},8000);fisdEnsurePollingLeader()}
+  fisdPublishShared(false);
+ })();
+}
+fisdBootSharedWorkspace();
+
+
+</script>
+</body>
+</html>
