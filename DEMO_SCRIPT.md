@@ -1,38 +1,29 @@
-![FISD XC](assets/fisd-xc-light.svg)
+# FISD XC — 90-second Buildathon Demo
 
-# FISD XC / OPS — 90-second demo script
+**0–10 seconds — Product thesis**
 
-## 00:00–00:12 · State the product
+“Blockscout supplies the evidence. FISD XC turns it into an explainable next investigative move.”
 
-“Blockscout is the evidence layer. FISD XC is the decision layer. We take indexed wallet or contract activity and help an operator choose what to inspect next, while keeping every live signal linked to the source.”
+**10–25 seconds — Connect a source**
 
-## 00:12–00:24 · Start in Simple mode
+Select a supported chain and paste a public wallet or contract address. If the key is not configured, explicitly stay in simulation mode and identify the records as simulated.
 
-Open the dashboard in **Simple** mode. Show the key metrics, impact field, recent activity and next best action. State clearly whether the screen is running simulation or live data. In the static preview, all sample records are simulated.
+**25–40 seconds — Current Position**
 
-## 00:24–00:38 · Expand the workings
+Show source context, sampled activity, the impact field and the temporal trace. Select one signal to link the chart, evidence row and recommendation.
 
-Select **Full workings**. Show the component contributions, transaction evidence, provider status, endpoint context and method panel. Explain that the score is a transparent triage heuristic, not a financial or fraud verdict.
+**40–55 seconds — Next Best Move / Move Board**
 
-## 00:38–00:55 · Connect live evidence
+Explain the heuristic score and the selected recommendation. Compare the recommended move with the alternatives and show the expected effect. State that the UI does not execute blockchain transactions.
 
-For the full-stack deployment only, connect a public wallet/contract on a chain permitted by the configured Blockscout Pro API key. Wait for a successful response, confirm the live provider status, then select a returned transaction. Never present the static preview as live.
+**55–70 seconds — Full Workings**
 
-## 00:55–01:09 · Verify the recommendation
+Switch to Full Workings and inspect the score components, method, provider status and transaction details.
 
-Read the selected event's recommendation and component breakdown. Open the corresponding Blockscout Explorer record to verify the sender, recipient, time/block and transaction state.
+**70–82 seconds — Verify**
 
-## 01:09–01:20 · Demonstrate operator control
+Open the selected transaction in Blockscout Explorer. Optionally add a local review marker and explain that it is an operator note, not an on-chain attestation.
 
-In Full workings mode, add a local manual note such as “Reconcile treasury outflow.” Show its explicit local-annotation label so it is not mistaken for chain evidence.
+**82–90 seconds — Close**
 
-## 01:20–01:30 · Close
-
-Switch dark/light mode briefly and close with: “One identity, two operating states. Blockscout is the evidence layer; FISD XC is the decision layer.”
-
-## Before recording
-
-- For live claims, verify the API key, chain permissions, address response and Explorer link in the deployed service.
-- Keep `.env` and the real key out of the repository and recording.
-- Use the static preview as a fallback and label its data as simulated.
-- Check Simple and Full workings states in both brand themes at desktop and mobile widths.
+“FISD XC is an evidence-linked triage workflow. It helps operators decide what to inspect next; its score is a heuristic, not a fraud verdict.”
