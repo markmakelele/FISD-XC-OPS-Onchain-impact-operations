@@ -1,61 +1,61 @@
-![FISD XC](assets/fisd-xc-light.svg)
+![FISD XC mark](assets/fisd-xc-light.svg)
 
 # FISD XC / OPS — Onchain Impact Operations
 
-**Product principle:** Blockscout is the evidence layer. FISD XC is the decision layer.
+**Product principle: Blockscout is the evidence layer. FISD XC is the decision layer.**
 
-FISD XC turns indexed wallet and contract activity into an explainable timeline, a transparent triage signal, and a next best inspection action. It does not replace Blockscout Explorer; every live recommendation remains traceable to source evidence.
+FISD XC turns Blockscout-indexed wallet and contract activity into an explainable triage signal, a recommended investigative move, and an evidence-linked verification path. The approved **Impact Cards** composition is the single canonical interface across desktop, tablet, and mobile. It replaces the previous split-focus layouts.
 
-## Two display states
+## The one-screen model
 
-The application includes one persistent FISD identity with two display states.
+1. **Current Position** — wallet/contract context, sample metrics, impact field and temporal trace.
+2. **Next Best Move** — the primary rules-based recommendation tied to the selected transaction.
+3. **Move Board** — recommended inspection, compare-neighbour activity, and follow-up monitoring. Each card previews its expected effect. The board does not execute blockchain transactions.
+4. **Verify Outcome** — source transaction, linked Explorer evidence, transaction details and a local operator review marker. A review marker is not an on-chain attestation.
 
-- **Simple:** focused on key metrics, impact field, recent activity and the recommended next action. It removes score diagnostics, provider details and operator annotation controls from the primary surface.
-- **Full workings / Complex:** reveals score components, raw transaction evidence, API/provider context, model methodology and local operator notes. Use it for audit, review and demonstration of how the recommendation was produced.
+## Simple and Full Workings
 
-The view preference is stored in the browser and does not change the underlying records or scoring. Dark/light mode follows the shared tokens in `assets/brand-tokens.css`; the mark switches from slate `#BDCBD4` on `#08090C` to black on `#F8F8F5`.
+- **Simple** focuses on the current signal, recommended move, alternatives and evidence.
+- **Full Workings** reveals score components, methodology, provider/API provenance and operator notes.
+- Both views use the same records, score logic, selected transaction, theme and monitoring state.
 
-## Choose a hosting profile
+## Interaction model
 
-### A. Simple static preview — GitHub Pages
-
-The `docs/` folder is a static, simulation-only preview. Publish from `main` / `/docs` using GitHub Pages. Live connection is intentionally disabled; no key is needed. The Simple / Full workings switch lets judges inspect the model explanation using simulated records.
-
-### B. Full-stack app + API — Render
-
-The root app is served by the Node.js API proxy. Deploy using `render.yaml`, then configure `BLOCKSCOUT_PRO_API_KEY` as a host secret. The server binds to `0.0.0.0` and the host-provided `PORT`. Full instructions: [`HOSTING_PROFILES.md`](HOSTING_PROFILES.md).
+Hover and keyboard focus explain an item's function and next paired function. Tap/click selects and highlights the item. Long press opens contextual inspection on touch devices. Haptics use the browser Vibration API where available; visible selection remains the fallback. Workspace state synchronises across open tabs on the same browser origin with BroadcastChannel and localStorage; it is not cross-device synchronisation.
 
 ## Run locally
 
 Requires Node.js 18 or newer.
 
 1. Copy `.env.example` to `.env`.
-2. Add a valid key as `BLOCKSCOUT_PRO_API_KEY`.
+2. Set `BLOCKSCOUT_PRO_API_KEY` using a key from https://dev.blockscout.com/.
 3. Run `npm start`.
-4. Open `http://127.0.0.1:4173`.
-5. Connect a public EVM address on a chain permitted by the key.
+4. Open http://127.0.0.1:4173.
+5. Select an EVM chain, enter a public wallet/contract address, and choose **Connect live**.
 
-Demo/simulation mode remains available without an API key. The key stays on the server and is never intentionally included in HTML, local storage or API responses.
+Demo mode works without a key and labels invented records as simulated. The API key is held server-side, never in browser storage or client-side HTML.
 
-## API routes
+## Blockscout API surface
 
-- `GET /api/health` — reports whether server-side configuration exists, the provider, and supported chain IDs.
-- `GET /api/monitor?chainId=1&address=0x...` — requests address context, recent transactions and best-effort token-transfer evidence.
+- `GET /api/health` reports provider configuration without returning the secret.
+- `GET /api/monitor?chainId=1&address=0x...` requests address context, up to 50 transactions and best-effort token-transfer evidence from Blockscout Pro REST v2.
 
-The MVP supports Ethereum (1), Optimism (10), Gnosis (100), Polygon (137), Arbitrum One (42161), and Base (8453), subject to API key/plan access. The transaction window is sampled, not exhaustive.
+Supported IDs in this MVP: Ethereum (1), Optimism (10), Gnosis (100), Polygon (137), Arbitrum One (42161), and Base (8453), subject to API key entitlements.
 
-## Signal model and limitations
+## Score and limitations
 
-The 0–100 signal is a heuristic based on recency, native-value magnitude relative to the observed sample, interaction type, outcome and direction. It is not a financial valuation, a fraud detector or a claim of intent or causality. Recommendations are rules-based and intended to guide human inspection. Token transfer data is currently supporting evidence rather than a separate token-flow graph.
+The 0–100 label is an explainable triage heuristic using recency, native-value magnitude relative to the loaded sample, interaction type, observed outcome and direction. It is not a financial valuation, fraud detector, or proof of intent/causality. Recommendations are rules-based and support human inspection. The integration samples up to 50 transactions; token transfers are supporting context rather than a full token-flow graph. Monitoring uses polling, not push streaming.
 
-## Brand and submission files
+## Canonical project files
 
-- [`BRAND_GUIDELINES.md`](BRAND_GUIDELINES.md) — shared identity and accessibility contract.
-- [`BRAND_OVERVIEW.html`](BRAND_OVERVIEW.html) — visual brand overview with mode/hosting model.
-- [`SUBMISSION_BRIEF.md`](SUBMISSION_BRIEF.md) — submission narrative and system scope.
-- [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md) — presentation run of show.
-- [`HOSTING_PROFILES.md`](HOSTING_PROFILES.md) — static and full-stack hosting instructions.
+- `index.html` — canonical responsive card-mode product UI.
+- `info_cards_sorting_data_points.html` — chosen interface filename; same UI and logic.
+- `where value selected inch into a blog preface.html` — compatibility name, now aligned to the same card mode.
+- `docs/index.html` — static, simulation-only preview for GitHub Pages.
+- `server.js` — server-side Blockscout API proxy and static file host.
+- `assets/` — transparent brand mark variants, favicon and colour tokens.
+- `BRAND_GUIDELINES.md`, `DECISION_BOARD_UX.md`, `HOSTING_PROFILES.md`, `SUBMISSION_BRIEF.md`, `DEMO_SCRIPT.md` — brand, UX and submission documentation.
 
-## Production boundary
+## Security / production boundary
 
-This package is a buildathon MVP. Production use would require identity/access control, tenancy isolation, persistent server-side data, proxy-aware throttling, alert delivery, automated tests and operational monitoring. Verify a real API response and Explorer link before describing any run as live.
+Never commit `.env` or embed the API key in HTML. Live mode must be tested with a valid key and a permitted address before it is presented as live. A production rollout still needs authentication, workspace isolation, durable server-side state, per-user rate limits, alert delivery, observability and automated tests.
