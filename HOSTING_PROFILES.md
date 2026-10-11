@@ -1,50 +1,32 @@
-# FISD XC — Web app and API hosting profiles
+# FISD XC — Hosting Profiles
 
-FISD XC has two **hosting profiles** and two **display states**. Do not confuse them: the Simple / Full workings switch controls UI density, while the hosting profile controls whether real API access exists.
+The selected Impact Cards interface is canonical across deployment profiles. **Simple / Full Workings changes the visible detail; static / full-stack changes the data capability.**
 
-## Hosting profile A — Simple static preview
+## Profile A — Static preview (GitHub Pages)
 
-**Purpose:** review the brand, dashboard interactions and model explanation without provisioning API credentials. This profile uses simulated example records only.
+Use `docs/` as the Pages publish directory. `docs/index.html` has the same visual system and `data-host-mode="static"`; it labels the dataset as simulated and disables live connection. This is for design review, usability testing and demo walkthroughs, not live blockchain monitoring.
 
-**Host:** GitHub Pages, publishing from `main` / `/docs`. The static build lives in `docs/index.html` with its own `docs/assets/`.
+1. Push the repository.
+2. Open Settings → Pages.
+3. Publish branch `main`, folder `/docs`.
+4. Verify the UI explicitly labels the records as simulated.
 
-### Deploy
+## Profile B — Full-stack app + API proxy (Render)
 
-1. Push the repository to GitHub.
-2. Open **Settings → Pages** for the repository.
-3. Choose **Deploy from a branch**, branch `main`, folder `/docs`.
-4. Save and wait for the Pages URL to become available.
-5. Confirm the banner and source status say **Static preview / simulation**. The **Connect live** control is disabled intentionally.
+The Node.js server serves the dashboard and proxies requests to Blockscout Pro REST v2. The API key remains server-side.
 
-The display switch still works: **Simple** is the decision-first view; **Full workings** shows simulated score contributions and the model/data explanation. It never changes simulated records into live chain data. No API key is needed or should be configured for this static host.
+1. Create a Render Blueprint from `render.yaml`, or create a Node web service using `npm start`.
+2. Configure `BLOCKSCOUT_PRO_API_KEY` as a hosting secret. Do not commit `.env`.
+3. Confirm `BLOCKSCOUT_PRO_API_BASE_URL=https://api.blockscout.com`.
+4. Use `/api/health` as the health check.
+5. Confirm health returns `configured: true`, then connect an address on a permitted chain.
+6. Select a transaction and validate its link in Blockscout Explorer.
 
-## Hosting profile B — Full-stack app + API proxy
+## API surface and limitations
 
-**Purpose:** connect real wallet/contract activity to Blockscout Pro REST v2 while keeping the API key server-side.
+- `GET /api/health` reports configuration without exposing the secret.
+- `GET /api/monitor?chainId=1&address=0x...` returns address context, up to 50 transactions, and best-effort token-transfer records.
+- Supported IDs: Ethereum (1), Optimism (10), Gnosis (100), Polygon (137), Arbitrum One (42161), and Base (8453), subject to API access.
+- Polling is 60-second interval, not a push stream. Token transfers are context, not a full token-flow graph.
 
-**Host:** Render Web Service using `render.yaml`. The Node process serves the main application and proxies requests to Blockscout. It binds to `0.0.0.0` using the host-provided `PORT`, as required for a public web service.
-
-### Deploy
-
-1. In Render, create a Blueprint from this repository, or create a Web Service with root directory `/`, build command `npm install` and start command `npm start`.
-2. Set the secret `BLOCKSCOUT_PRO_API_KEY` in the Render Environment panel. Do not commit `.env` or embed the key in HTML.
-3. Set `BLOCKSCOUT_PRO_API_BASE_URL` to `https://api.blockscout.com` if the blueprint did not set it.
-4. Set the health check path to `/api/health`.
-5. Deploy, open the generated service URL and confirm `/api/health` reports `configured: true`. The health response does not disclose the key.
-6. Connect a public EVM address on a chain permitted by the key, then open a returned transaction in Blockscout Explorer to verify evidence.
-
-### Display states inside the full-stack app
-
-- **Simple:** essentials only: KPIs, impact/timeline, recent transaction summary and recommended next action.
-- **Full workings:** score decomposition, raw transaction evidence, provider/source status, endpoint context, methodology and local operator notes.
-
-The view preference is saved locally in the browser. It does not change scoring, data fetching or chain access.
-
-## API surface
-
-- `GET /api/health` — provider configuration status and allowed chain IDs; never returns the key.
-- `GET /api/monitor?chainId=1&address=0x...` — address metadata, up to 50 transaction records, and best-effort token-transfer evidence.
-
-## Operational limitations
-
-The included app is an MVP, not a production custody or monitoring service. It uses a rule-based triage score, samples up to 50 transactions, and can poll on an interval. Before production use, add authentication/authorization, persistent user/workspace storage, robust proxy-aware rate limiting, structured logs, alert delivery, automated tests, and deployment-specific monitoring. The Render free tier can spin down after inactivity; for a time-sensitive live demonstration, warm the service and verify its key/chain access beforehand.
+Public production needs authentication, multi-user isolation, durable state, per-user rate limits, alerting, logs, monitoring and automated tests.
