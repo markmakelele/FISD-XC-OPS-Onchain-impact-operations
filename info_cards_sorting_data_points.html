@@ -387,10 +387,10 @@ stopMonitor=function(){originalStopMonitor();if($('refreshStatusComplex'))$('ref
 
 
 /* Shared workspace: both FISD XC layouts use the same state, score model and API route. */
-const FISD_WORKSPACE_KEY='fisdXC:shared-workspace:v1';
-const FISD_POLL_LEASE_KEY='fisdXC:poll-lease:v1';
+const FISD_WORKSPACE_KEY=STATIC_PREVIEW?'fisdXC:static-preview:workspace:v1':'fisdXC:shared-workspace:v1';
+const FISD_POLL_LEASE_KEY=STATIC_PREVIEW?'fisdXC:static-preview:poll-lease:v1':'fisdXC:poll-lease:v1';
 const FISD_TAB_ID=(window.crypto&&window.crypto.randomUUID)?window.crypto.randomUUID():'tab-'+Date.now()+'-'+Math.random().toString(36).slice(2);
-const FISD_CHANNEL=('BroadcastChannel' in window)?new BroadcastChannel('fisdXC:shared-workspace:v1'):null;
+const FISD_CHANNEL=('BroadcastChannel' in window)?new BroadcastChannel(STATIC_PREVIEW?'fisdXC:static-preview:workspace:v1':'fisdXC:shared-workspace:v1'):null;
 let fisdApplyingShared=false, fisdLastSignature='', fisdActiveCardKey='', fisdPollHeartbeat=null, fisdLongPressTimer=null, fisdLongPressTarget=null, fisdLongPressOrigin=null, fisdLongPressFired=false, fisdPressStart=null, fisdSuppressClickUntil=0, fisdLastAppliedAt=0, fisdLongPressOriginElement=null, fisdSuppressSelectionHaptic=false;
 let fisdInsight=document.getElementById('fisdInsight');
 if(!fisdInsight){fisdInsight=document.createElement('aside');fisdInsight.id='fisdInsight';fisdInsight.className='fisd-insight';fisdInsight.setAttribute('role','status');fisdInsight.setAttribute('aria-live','polite');document.body.appendChild(fisdInsight)}
