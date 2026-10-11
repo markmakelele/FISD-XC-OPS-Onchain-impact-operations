@@ -1,52 +1,30 @@
-![FISD XC](assets/fisd-xc-light.svg)
+# FISD XC — Blockscout PRO API Buildathon Write-up
 
-# FISD XC / OPS — Blockscout buildathon brief
+## Product
 
-## Thesis
-
-FISD XC turns Blockscout-indexed wallet and contract activity into an explainable operational timeline, a visible triage signal, and a next best inspection action. Blockscout supplies evidence; FISD XC provides the decision layer.
+FISD XC / OPS turns Blockscout-indexed wallet and contract activity into an explainable operational timeline, a triage signal, and an evidence-linked next action. Blockscout is a core dependency: live transaction samples and Explorer verification links come from its API and Explorer.
 
 ## Problem
 
-An explorer presents individual records. Treasury operators, protocol teams and builders still need to connect timing, addresses, outcomes and contract interactions before deciding what deserves attention. FISD XC adds a navigable interpretation layer without replacing the explorer or obscuring its evidence.
+Public on-chain activity is inspectable but operators still need to connect transaction timing, destination, native value, contract interaction and outcome before deciding what to investigate. FISD XC organises these facts into one actionable card-based sequence.
 
-## Product sequence
+## Workflow
 
-1. Connect a public wallet or contract on a supported chain.
-2. Retrieve address context, transaction history and best-effort token-transfer evidence through Blockscout Pro REST v2.
-3. Normalize returned records into time-indexed events.
-4. Calculate a transparent 0–100 triage heuristic from visible inputs.
-5. Render sampled activity in the impact field and timeline, linked to the source record.
-6. Recommend a next inspection action and open the original Blockscout Explorer record.
-7. Let a human operator add an annotation that remains visibly separate from onchain observations.
+1. Select a supported chain and enter a public EVM address.
+2. Request address metadata, transaction history and best-effort token-transfer evidence from Blockscout Pro REST v2 through the server-side proxy.
+3. Normalise records into the time trace and impact field.
+4. Calculate an explainable triage heuristic using recency, sample-relative native value, interaction type, returned outcome and direction.
+5. Recommend a review action: failed transaction review, contract interaction review, outflow verification, inflow reconciliation, or neighbouring-pattern comparison.
+6. Keep the selected move, source evidence and operator verification together in the card-based decision board.
 
-## Two application states
+## Why Blockscout is central
 
-- **Simple:** an operator-first view containing the key metrics, impact/timeline visualization, recent activity and next action.
-- **Full workings / Complex:** the audit view exposes component math, source provenance, API status, raw transaction evidence, methodology and local operator notes.
+Without Blockscout's address and transaction responses, live mode has no observed transaction set or authoritative Explorer evidence to support recommendations. Demo data is separately labelled as simulated.
 
-The two states share the same data, score and brand identity. They differ in the amount of interface detail, not in the truth status of the information.
+## UX direction
 
-## Hosting model
+The final interface uses the approved Impact Cards layout at every screen size. It follows **Current Position → Next Best Move → Move Board → Verify Outcome**. Simple mode prioritises action; Full Workings reveals score components, method and provider provenance. Hover, keyboard focus, tap and long press explain/select cards; haptics are optional enhancement.
 
-The static GitHub Pages preview is simulation-only and never enables live API calls. The full-stack Render profile serves the Node app and API proxy, keeps the API key in the host's environment secrets and connects to Blockscout Pro. This separation provides an accessible demo path without pretending that a static front end can safely keep a key or query the live API by itself.
+## Honest scope
 
-## Why Blockscout is essential
-
-Live mode requires Blockscout responses for address context and indexed transaction history; token transfers add supporting evidence. FISD does not claim a live interpretation until the API request succeeds. Live transactions remain linkable to their Blockscout Explorer source.
-
-## Differentiation
-
-FISD XC is an operations layer, not another explorer: **observed transaction → explainable triage signal → recommended next action → Explorer verification**. The spatial impact field is a way to navigate a sequence; it does not prove causal relationships between transactions.
-
-## Evidence and limitations
-
-The score is a prioritization heuristic, not a monetary-impact valuation, fraud verdict, risk guarantee, or inference of intent. Native-value comparisons are relative to the returned sample. The application samples up to 50 records and uses interval polling; it does not provide a complete historical index, a separate token-flow graph or push-streaming. Before production use, add authentication, persistent server-side storage, tenant isolation, stronger proxy-aware rate limiting, alerting, observability and automated tests.
-
-## Demo acceptance
-
-- Show Simple mode first and clearly identify the selected data as simulation or live.
-- Switch to Full workings and explain the component score and API provenance.
-- In a live run, select an actual transaction and open its Explorer record.
-- Demonstrate a manual operator note and explain that it is not onchain data.
-- Show the dark/light brand transition and the two hosting profiles.
+The score is a prioritisation heuristic, not a fraud detector, price valuation or proof of intent. The MVP samples the first 50 transactions and polls; it does not stream. Token transfers are supporting context rather than a full token-flow graph. Live API operation must be demonstrated with a permitted API key and address before presenting it as live.
