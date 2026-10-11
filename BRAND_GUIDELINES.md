@@ -1,55 +1,54 @@
-![FISD XC](assets/fisd-xc-light.svg)
+# FISD XC — Brand Identity Guidelines
 
-# FISD XC — Shared Brand ID
+## Canonical direction
 
-## Brand principle
+The approved product mode is the **Impact Cards** system: one vertically coherent decision journey with responsive, spacious cards. The earlier editorial layout is no longer a separate operating interface. The same card grammar applies across the web app, API-connected dashboard, documentation, screenshots and submission materials.
 
-**Quiet precision. Visible relationships. Verifiable evidence.** The brand mark identifies the product; interface colour explains the operating context; semantic state colours communicate connection, warning and error. Never make the brand colour itself a safety or risk verdict.
+## Brand mark
 
-## Approved marks
+- Preserve the stacked `fisd / XC` proportions; do not stretch or redraw the geometry.
+- Dark surfaces use the transparent pale-slate mark (`assets/fisd-xc-dark.svg`, `#BDCBD4`).
+- Light surfaces use the transparent black mark (`assets/fisd-xc-light.svg`, `#000000`).
+- Maintain clear space around the mark and scale proportionally.
+- The main UI uses the inline master mark; exported SVG assets serve documents and presentation material.
 
-| Context | Mark | Canvas |
+## Colour foundations
+
+| Token | Value | Purpose |
 |---|---|---|
-| Dark mode | Slate `#BDCBD4` | Night `#08090C` |
-| Light mode | Ink `#000000` | Paper `#F8F8F5` |
-| Compact UI | Compact mark in `assets/` | Use the variant matching the canvas |
+| Dark background | `#08090C` | Main dark surface |
+| Dark panel | `#0E1015` | Cards and working surfaces |
+| Dark raised panel | `#12151B` | Controls and secondary surfaces |
+| Primary dark text | `#F3F4F5` | High-priority copy |
+| Muted dark text | `#A3A9B4` | Supporting copy |
+| Dark-mode brand slate | `#BDCBD4` | Brand accent on dark |
+| Light background | `#F8F8F5` | Main light surface |
+| Light panel | `#FFFFFF` | Card face |
+| Light text | `#11110F` | Primary copy |
+| Light muted text | `#5E5E58` | Supporting copy |
+| Positive state | `#82D8B4` | Success/verified state, with text labels |
+| Caution state | `#E4C27A` | Warning, with text labels |
+| Error state | `#F17C85` | Error, with text labels |
 
-Use the supplied transparent SVGs. Do not rebuild the mark with a substitute font, distort its proportions, recolour it arbitrarily, or place the slate expression on white. The stacked lockup is for overview and brand pages; compact assets are for constrained headers.
+Low-opacity violet, peach and green washes can distinguish card categories. They must not be the only carrier of operational meaning. Do not use the brand slate as an implied safety score.
 
-## Shared colour tokens
+## Layout and typography
 
-- Brand slate: `#BDCBD4`
-- Ink: `#000000`
-- Night: `#08090C`
-- Paper: `#F8F8F5`
-- Dark surface: `#0E1015`
-- Light surface: `#FFFFFF`
-- Dark primary text: `#F3F4F5`
-- Light primary text: `#11110F`
-- Dark muted text: `#A3A9B4`
-- Light muted text: `#5E5E58`
+- Maintain one route: **Current Position → Next Best Move → Move Board → Verify Outcome**.
+- Use larger type for the primary score and action headline; monospace labels for metadata and evidence states.
+- Use `clamp()`, CSS Grid and responsive breakpoints. Cards can change spans; reading order must remain consistent.
+- Keep visible keyboard focus and honour reduced-motion preferences.
+- Simple prioritises the decision. Full Workings reveals advanced detail without becoming a separate application.
 
-The shared CSS contract is `assets/brand-tokens.css`; avoid duplicating theme palettes inside individual files. Interface-only tokens can extend the shared contract, but the brand colours above remain canonical.
+## Interaction and accessibility
 
-## Typography and interface
+Hover/focus explains functions, tap/click selects, and long press opens details on touch devices. Haptics are progressive enhancement only: `navigator.vibrate()` is used when supported, with visual feedback as fallback. Status is always expressed in text as well as colour. Verify contrast on rendered surfaces.
 
-Use a legible system sans-serif for prose and a monospace face for addresses, hashes, endpoint names and numeric evidence. Body copy should be normally tracked; wide letter spacing is reserved for short labels. Use restrained 4–6 px corners, thin rules and ample negative space. Keep data tables quiet and scannable.
+## Product truthfulness
 
-## Two operating states
+- **Observed:** sourced from a Blockscout response.
+- **Inferred:** produced by the FISD rule-based model.
+- **Recommended:** a proposed operator action.
+- **Verified:** confirmed by a source check or explicit operator review.
 
-- **Simple:** essential metrics, impact field, recent activity and next best action.
-- **Full workings / Complex:** transaction table, data provenance, API status, score-component breakdown, model methodology and local operator annotations.
-
-These are display states, not separate data-integrity levels. Both must label simulation and live data truthfully.
-
-## Accessibility
-
-Target WCAG AA: 4.5:1 contrast for normal text; 3:1 for qualifying large text and essential graphical components. Keep visible keyboard focus, semantic button labels and touch-equivalent inspection. State must never be represented by colour alone. Test the actual rendered page in both themes.
-
-## Voice and evidence
-
-Separate observed onchain facts, computed heuristic scores, rules-based recommendations and operator-authored notes. The signal is not a fraud detector, monetary impact estimate, or proof of intent or causality. Link live recommendations back to Blockscout Explorer evidence.
-
-## Attribution
-
-FISD XC is the product identity. Blockscout is the data provider and Explorer verification destination. Do not imply official endorsement by Blockscout.
+Never present simulation as real, a local review marker as an on-chain attestation, or a triage score as a fraud verdict.
